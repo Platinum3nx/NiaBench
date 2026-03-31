@@ -1,6 +1,6 @@
 # OpenClaw Brief
 
-Use this prompt for the overnight draft task generation run.
+Use this prompt for bulk task generation.
 
 ```text
 Task: Generate benchmark tasks for the NiaBench project.
