@@ -1,0 +1,16 @@
+.DS_Store
+.env
+.env.local
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+node_modules/
+.next/
+dist/
+
+results/*
+!results/.gitkeep
+!results/scores.json

@@ -1,0 +1,32 @@
+{
+  "api-migration": {
+    "focus": "Does the answer use the current API instead of the deprecated one?",
+    "score_2": "Uses the current API correctly and avoids deprecated imports, methods, and argument patterns.",
+    "score_1": "Gets the intent mostly right but still includes at least one deprecated or version-incompatible pattern.",
+    "score_0": "Uses the deprecated API or a pattern that would clearly fail on the target version."
+  },
+  "import-path": {
+    "focus": "Does the answer import the right symbol from the right module path for the target version?",
+    "score_2": "All imports resolve correctly for the target version.",
+    "score_1": "Logic is mostly correct but at least one import path or exported symbol is outdated.",
+    "score_0": "Imports are fundamentally wrong for the target version."
+  },
+  "config-schema": {
+    "focus": "Does the answer produce configuration that matches the new schema shape and field names?",
+    "score_2": "Configuration matches the current schema and would validate as-is.",
+    "score_1": "Configuration is directionally correct but includes outdated field names, nesting, or values.",
+    "score_0": "Configuration follows the old schema or would fail validation outright."
+  },
+  "type-signature": {
+    "focus": "Does the answer match the updated function signature and type expectations?",
+    "score_2": "Uses the correct current signature and types without deprecated overloads or parameters.",
+    "score_1": "Gets the general call shape right but includes at least one outdated parameter, type, or return assumption.",
+    "score_0": "Uses a signature that is clearly incompatible with the target version."
+  },
+  "best-practice": {
+    "focus": "Does the answer use the currently recommended pattern for the library and version?",
+    "score_2": "Uses the current idiomatic approach documented for the target version.",
+    "score_1": "Would partly work but follows an older or discouraged approach.",
+    "score_0": "Uses a pattern that is outdated, discouraged, or incompatible with the target version."
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://niabench.dev/schemas/task.schema.json",
+  "title": "NiaBench Task",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "library",
+    "version_introduced",
+    "task_description",
+    "deprecated_pattern",
+    "correct_pattern",
+    "reference_solution",
+    "difficulty",
+    "category",
+    "executable",
+    "why_models_fail_this"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "minLength": 5
+    },
+    "library": {
+      "type": "string",
+      "minLength": 2
+    },
+    "version_introduced": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_description": {
+      "type": "string",
+      "minLength": 20
+    },
+    "deprecated_pattern": {
+      "type": "string",
+      "minLength": 3
+    },
+    "correct_pattern": {
+      "type": "string",
+      "minLength": 3
+    },
+    "reference_solution": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "easy",
+        "medium",
+        "hard"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "api-migration",
+        "import-path",
+        "config-schema",
+        "type-signature",
+        "best-practice"
+      ]
+    },
+    "executable": {
+      "type": "boolean"
+    },
+    "why_models_fail_this": {
+      "type": "string",
+      "minLength": 20
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "executable": {
+            "const": true
+          }
+        },
+        "required": [
+          "executable"
+        ]
+      },
+      "then": {
+        "properties": {
+          "reference_solution": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ]
+}
