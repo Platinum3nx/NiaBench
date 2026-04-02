@@ -96,6 +96,24 @@ main {
   margin-top: 8px;
 }
 
+.hero-stat {
+  text-align: center;
+  padding: 12px 0;
+}
+
+.hero-stat strong {
+  display: block;
+  font-size: clamp(3.5rem, 8vw, 6rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.hero-stat p {
+  color: var(--muted);
+  margin: 6px 0 0;
+  font-size: 1rem;
+}
+
 .panel-grid {
   margin-top: 22px;
   display: grid;

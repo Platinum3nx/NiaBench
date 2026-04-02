@@ -42,18 +42,40 @@ export default function HomePage() {
           NiaBench measures how much frontier coding models improve when they get fresh,
           indexed documentation context instead of relying on stale training knowledge.
         </p>
+        <div className="hero-stat">
+          <strong className={deltaClass(summary.nonperfect_baseline_delta_pct)}>
+            {formatSignedPercent(summary.nonperfect_baseline_delta_pct)}
+          </strong>
+          <p>
+            improvement when the baseline scored below the rubric maximum
+            ({summary.nonperfect_baseline_count} of {evaluationsCount} evaluations,{" "}
+            {formatPercent(summary.nonperfect_baseline_without_nia)} &rarr;{" "}
+            {formatPercent(summary.nonperfect_baseline_with_nia)})
+          </p>
+        </div>
+
         <div className="stats">
           <article className="stat-card">
-            <p>Without Nia</p>
-            <strong>{formatPercent(summary.overall_without_nia)}</strong>
+            <p>Overall delta</p>
+            <strong>{formatSignedPercent(summary.improvement_delta_pct)}</strong>
+            <p>
+              {formatPercent(summary.overall_without_nia)} &rarr;{" "}
+              {formatPercent(summary.overall_with_nia)}
+            </p>
+            <p>All {evaluationsCount} evaluations</p>
           </article>
           <article className="stat-card">
-            <p>With Nia</p>
-            <strong>{formatPercent(summary.overall_with_nia)}</strong>
-          </article>
-          <article className="stat-card">
-            <p>Delta</p>
-            <strong>{formatPercent(summary.improvement_delta_pct)}</strong>
+            <p>Perfect baseline delta</p>
+            <strong className={deltaClass(summary.perfect_baseline_delta_pct)}>
+              {formatSignedPercent(summary.perfect_baseline_delta_pct)}
+            </strong>
+            <p>
+              {formatPercent(summary.perfect_baseline_without_nia)} &rarr;{" "}
+              {formatPercent(summary.perfect_baseline_with_nia)}
+            </p>
+            <p>
+              {summary.perfect_baseline_count} of {evaluationsCount} evaluations
+            </p>
           </article>
           <article className="stat-card">
             <p>Evaluations / Libraries</p>
@@ -61,64 +83,26 @@ export default function HomePage() {
               {evaluationsCount} / {summary.libraries_covered}
             </strong>
             <p>
-              ({uniqueTasks} unique tasks x {modelCount} models)
-            </p>
-          </article>
-        </div>
-
-        <div className="stats">
-          <article className="stat-card">
-            <p>Non-perfect baseline</p>
-            <strong>
-              {formatPercent(summary.nonperfect_baseline_without_nia)} -&gt;{" "}
-              {formatPercent(summary.nonperfect_baseline_with_nia)}
-            </strong>
-            <p>Baseline scored below rubric maximum</p>
-            <p>
-              {summary.nonperfect_baseline_count} of {evaluationsCount} evaluations
-            </p>
-            <p>
-              Delta:{" "}
-              <span className={deltaClass(summary.nonperfect_baseline_delta_pct)}>
-                {formatSignedPercent(summary.nonperfect_baseline_delta_pct)}
-              </span>
-            </p>
-          </article>
-
-          <article className="stat-card">
-            <p>Perfect baseline</p>
-            <strong>
-              {formatPercent(summary.perfect_baseline_without_nia)} -&gt;{" "}
-              {formatPercent(summary.perfect_baseline_with_nia)}
-            </strong>
-            <p>Baseline scored rubric maximum</p>
-            <p>
-              {summary.perfect_baseline_count} of {evaluationsCount} evaluations
-            </p>
-            <p>
-              Delta:{" "}
-              <span className={deltaClass(summary.perfect_baseline_delta_pct)}>
-                {formatSignedPercent(summary.perfect_baseline_delta_pct)}
-              </span>
+              ({uniqueTasks} tasks &times; {modelCount} models)
             </p>
           </article>
         </div>
 
         <div className="callout">
           The overall delta ({formatSignedPercent(summary.improvement_delta_pct)}) blends two
-          evaluation populations. In {summary.perfect_baseline_count} evaluations, the baseline
-          scored the rubric maximum (2/2) and the average delta with context was{" "}
-          <span className={deltaClass(summary.perfect_baseline_delta_pct)}>
-            {formatSignedPercent(summary.perfect_baseline_delta_pct)}
-          </span>
-          . In {summary.nonperfect_baseline_count} evaluations where baseline was below maximum,
-          the average delta with context was{" "}
+          evaluation populations. In {summary.nonperfect_baseline_count} evaluations where the
+          baseline scored below the rubric maximum, context improved scores by{" "}
           <span className={deltaClass(summary.nonperfect_baseline_delta_pct)}>
             {formatSignedPercent(summary.nonperfect_baseline_delta_pct)}
           </span>
-          . This is a descriptive split on observed baseline score, not a direct measure of model
-          knowledge. Because {uniqueTasks} unique tasks are evaluated across {modelCount} models (
-          {evaluationsCount} evaluations total), the same task can appear in different segments.
+          . In {summary.perfect_baseline_count} evaluations where the baseline already scored
+          the maximum (2/2), adding context changed scores by{" "}
+          <span className={deltaClass(summary.perfect_baseline_delta_pct)}>
+            {formatSignedPercent(summary.perfect_baseline_delta_pct)}
+          </span>
+          . This is a descriptive split on observed baseline score. Because {uniqueTasks} tasks
+          are evaluated across {modelCount} models ({evaluationsCount} evaluations total), the
+          same task can appear in different segments depending on the model.
         </div>
       </section>
 
