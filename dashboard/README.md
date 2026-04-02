@@ -1,10 +1,24 @@
-# Dashboard
+# NiaBench Dashboard
 
-This directory will contain the public Next.js dashboard for NiaBench.
+Next.js dashboard for the current NiaBench launch artifact set.
 
-Planned pages:
+## Data Source
 
-- Hero page with overall without-Nia vs with-Nia delta
-- Library leaderboard
-- Task drilldown pages
-- Methodology page
+- Reads committed benchmark aggregate from `results/scores.json`
+- Founder-facing aggregate must be regenerated from `results/raw_curated/combined`
+
+## Local Build
+
+```bash
+cd dashboard
+npm ci
+npm run build
+```
+
+## Vercel Deploy Path
+
+```bash
+npx vercel pull --yes --environment preview --cwd dashboard
+npx vercel build --yes --prod --cwd dashboard
+npx vercel deploy --prebuilt --prod --yes --cwd dashboard
+```

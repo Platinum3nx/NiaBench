@@ -1,0 +1,142 @@
+[
+  {
+    "id": "vercel-ai-sdk",
+    "label": "Vercel AI SDK",
+    "ecosystem": "typescript",
+    "github_repo": "vercel/ai",
+    "min_tasks": 10
+  },
+  {
+    "id": "langchain-python",
+    "label": "LangChain Python",
+    "ecosystem": "python",
+    "github_repo": "langchain-ai/langchain",
+    "min_tasks": 10
+  },
+  {
+    "id": "langchain-js",
+    "label": "LangChain JS",
+    "ecosystem": "typescript",
+    "github_repo": "langchain-ai/langchainjs",
+    "min_tasks": 8
+  },
+  {
+    "id": "llamaindex",
+    "label": "LlamaIndex",
+    "ecosystem": "python",
+    "github_repo": "run-llama/llama_index",
+    "min_tasks": 8
+  },
+  {
+    "id": "huggingface-transformers",
+    "label": "HuggingFace Transformers",
+    "ecosystem": "python",
+    "github_repo": "huggingface/transformers",
+    "min_tasks": 8
+  },
+  {
+    "id": "trpc",
+    "label": "tRPC",
+    "ecosystem": "typescript",
+    "github_repo": "trpc/trpc",
+    "min_tasks": 8
+  },
+  {
+    "id": "prisma",
+    "label": "Prisma",
+    "ecosystem": "typescript",
+    "github_repo": "prisma/prisma",
+    "min_tasks": 8
+  },
+  {
+    "id": "drizzle-orm",
+    "label": "Drizzle ORM",
+    "ecosystem": "typescript",
+    "github_repo": "drizzle-team/drizzle-orm",
+    "min_tasks": 7
+  },
+  {
+    "id": "authjs",
+    "label": "NextAuth / Auth.js",
+    "ecosystem": "typescript",
+    "github_repo": "nextauthjs/next-auth",
+    "min_tasks": 8
+  },
+  {
+    "id": "anthropic-sdk",
+    "label": "Anthropic SDK",
+    "ecosystem": "multi",
+    "github_repo": "anthropics/anthropic-sdk-typescript",
+    "min_tasks": 7
+  },
+  {
+    "id": "openai-sdk",
+    "label": "OpenAI SDK",
+    "ecosystem": "multi",
+    "github_repo": "openai/openai-node",
+    "min_tasks": 7
+  },
+  {
+    "id": "tanstack-query",
+    "label": "TanStack Query",
+    "ecosystem": "typescript",
+    "github_repo": "TanStack/query",
+    "min_tasks": 7
+  },
+  {
+    "id": "tanstack-router",
+    "label": "TanStack Router",
+    "ecosystem": "typescript",
+    "github_repo": "TanStack/router",
+    "min_tasks": 6
+  },
+  {
+    "id": "supabase-js",
+    "label": "Supabase JS",
+    "ecosystem": "typescript",
+    "github_repo": "supabase/supabase-js",
+    "min_tasks": 6
+  },
+  {
+    "id": "zod",
+    "label": "Zod",
+    "ecosystem": "typescript",
+    "github_repo": "colinhacks/zod",
+    "min_tasks": 6
+  },
+  {
+    "id": "shadcn-ui",
+    "label": "shadcn/ui",
+    "ecosystem": "typescript",
+    "github_repo": "shadcn-ui/ui",
+    "min_tasks": 6
+  },
+  {
+    "id": "huggingface-diffusers",
+    "label": "HuggingFace Diffusers",
+    "ecosystem": "python",
+    "github_repo": "huggingface/diffusers",
+    "min_tasks": 6
+  },
+  {
+    "id": "effect-ts",
+    "label": "Effect-TS",
+    "ecosystem": "typescript",
+    "github_repo": "Effect-TS/effect",
+    "min_tasks": 5
+  },
+  {
+    "id": "upstash-redis-sdk",
+    "label": "Upstash Redis SDK",
+    "ecosystem": "typescript",
+    "github_repo": "upstash/redis-js",
+    "min_tasks": 5
+  },
+  {
+    "id": "radix-ui",
+    "label": "Radix UI",
+    "ecosystem": "typescript",
+    "github_repo": "radix-ui/primitives",
+    "min_tasks": 5
+  }
+]

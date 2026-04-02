@@ -1,0 +1,41 @@
+[
+  {
+    "id": "smoke-openai-api-migration",
+    "library": "openai-sdk",
+    "version_introduced": "v4.0",
+    "task_description": "Migrate this OpenAI Node snippet to the current SDK style for a simple text generation request.",
+    "deprecated_pattern": "openai.ChatCompletion.create",
+    "correct_pattern": "client.responses.create",
+    "reference_solution": "import OpenAI from \"openai\";\nconst client = new OpenAI();\nconst response = await client.responses.create({ model: \"gpt-4.1-mini\", input: \"hello\" });\nconsole.log(response.output_text);",
+    "difficulty": "easy",
+    "category": "api-migration",
+    "executable": false,
+    "why_models_fail_this": "Older examples heavily feature ChatCompletion APIs, so stale models often return deprecated calls with high confidence."
+  },
+  {
+    "id": "smoke-authjs-import-path",
+    "library": "authjs",
+    "version_introduced": "v5",
+    "task_description": "Update this NextAuth import usage so it follows the current Auth.js v5 import paths and initialization pattern.",
+    "deprecated_pattern": "import NextAuth from \"next-auth/next\"",
+    "correct_pattern": "import NextAuth from \"next-auth\"",
+    "reference_solution": null,
+    "difficulty": "medium",
+    "category": "import-path",
+    "executable": false,
+    "why_models_fail_this": "A large amount of public code still references older import paths from previous major versions, causing outdated responses."
+  },
+  {
+    "id": "smoke-prisma-config-schema",
+    "library": "prisma",
+    "version_introduced": "v5",
+    "task_description": "Rewrite this Prisma setup snippet to match the current datasource and generator configuration shape for Prisma v5.",
+    "deprecated_pattern": "previewFeatures = [\"clientExtensions\"]",
+    "correct_pattern": "clientExtensions no longer requires previewFeatures flag",
+    "reference_solution": "generator client {\n  provider = \"prisma-client-js\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}",
+    "difficulty": "hard",
+    "category": "config-schema",
+    "executable": true,
+    "why_models_fail_this": "Version drift in Prisma config examples is common, and stale models often include removed or obsolete preview flags."
+  }
+]

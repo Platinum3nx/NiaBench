@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate benchmark task file
+        run: python3 scripts/validate_tasks.py dataset/tasks.json
+
+      - name: Validate smoke fixture
+        run: python3 scripts/validate_tasks.py dataset/tasks_smoke.json
+
+      - name: Compile core Python modules
+        run: python3 -m compileall harness grading scripts
+
+      - name: Validate scores contract
+        run: python3 scripts/validate_scores.py results/scores.json
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build dashboard
+        working-directory: dashboard
+        run: |
+          npm ci
+          npm run build
