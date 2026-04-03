@@ -49,21 +49,6 @@ function completedOnlyDeltaClass(value: number | null): string {
   return deltaClass(value);
 }
 
-function mean(values: Array<number | null>): number | null {
-  const filtered = values.filter((value): value is number => value !== null);
-  if (filtered.length === 0) {
-    return null;
-  }
-  return filtered.reduce((sum, value) => sum + value, 0) / filtered.length;
-}
-
-function delta(left: number | null, right: number | null): number | null {
-  if (left === null || right === null) {
-    return null;
-  }
-  return left - right;
-}
-
 function conditionLabel(condition: string): string {
   if (condition === "nia_agent") {
     return "Nia Agent";
@@ -95,18 +80,6 @@ export default function AgentPage() {
     );
   }
   const { summary, conditions, libraries, tasks } = scores;
-  const libraryCompletionDelta = new Map<string, number | null>(
-    libraries.map((library) => {
-      const libraryTasks = tasks.filter((task) => task.library === library.library);
-      const noRetrievalCompletion = mean(
-        libraryTasks.map((task) => task.by_condition.no_retrieval_agent.completion_rate),
-      );
-      const niaCompletion = mean(
-        libraryTasks.map((task) => task.by_condition.nia_agent.completion_rate),
-      );
-      return [library.library, delta(niaCompletion, noRetrievalCompletion)];
-    }),
-  );
 
   return (
     <>
@@ -216,20 +189,15 @@ export default function AgentPage() {
       <section className="panel-grid">
         <article className="panel">
           <h2>Library summary</h2>
-          <p>
-            Completed-only ties are common with coarse pass/fail style outcomes, so crash-aware and
-            completion-gap deltas provide additional signal.
-          </p>
+          <p>Completed-only fields require at least one successful run for the row and condition.</p>
           <table className="leaderboard">
             <thead>
               <tr>
                 <th>Library</th>
                 <th>Tasks</th>
-                <th>No retrieval quality</th>
-                <th>Nia quality</th>
-                <th>Completed-only delta</th>
-                <th>Crash-aware delta</th>
-                <th>Completion gap</th>
+                <th>No retrieval</th>
+                <th>Nia</th>
+                <th>Delta</th>
               </tr>
             </thead>
             <tbody>
@@ -250,12 +218,6 @@ export default function AgentPage() {
                   <td className={completedOnlyDeltaClass(library.delta_completed_only_pct)}>
                     {formatCompletedOnlyDelta(library.delta_completed_only_pct)}
                   </td>
-                  <td className={deltaClass(library.delta_crash_aware_pct)}>
-                    {formatSignedPercent(library.delta_crash_aware_pct)}
-                  </td>
-                  <td className={deltaClass(libraryCompletionDelta.get(library.library) ?? null)}>
-                    {formatSignedPercent(libraryCompletionDelta.get(library.library) ?? null)}
-                  </td>
                 </tr>
               ))}
             </tbody>
@@ -264,20 +226,15 @@ export default function AgentPage() {
 
         <article className="panel">
           <h2>Task summary</h2>
-          <p>
-            Completed-only quality is preserved for comparability, while crash-aware delta and
-            completion gap highlight operational differences between conditions.
-          </p>
+          <p>Rows without successful runs still count in crash-aware metrics above.</p>
           <table className="leaderboard">
             <thead>
               <tr>
                 <th>Task</th>
                 <th>Difficulty</th>
-                <th>No retrieval quality</th>
-                <th>Nia quality</th>
-                <th>Completed-only delta</th>
-                <th>Crash-aware delta</th>
-                <th>Completion gap</th>
+                <th>No retrieval</th>
+                <th>Nia</th>
+                <th>Delta</th>
               </tr>
             </thead>
             <tbody>
@@ -295,24 +252,6 @@ export default function AgentPage() {
                   </td>
                   <td className={completedOnlyDeltaClass(task.delta_completed_only_pct)}>
                     {formatCompletedOnlyDelta(task.delta_completed_only_pct)}
-                  </td>
-                  <td className={deltaClass(task.delta_crash_aware_pct)}>
-                    {formatSignedPercent(task.delta_crash_aware_pct)}
-                  </td>
-                  <td
-                    className={deltaClass(
-                      delta(
-                        task.by_condition.nia_agent.completion_rate,
-                        task.by_condition.no_retrieval_agent.completion_rate,
-                      ),
-                    )}
-                  >
-                    {formatSignedPercent(
-                      delta(
-                        task.by_condition.nia_agent.completion_rate,
-                        task.by_condition.no_retrieval_agent.completion_rate,
-                      ),
-                    )}
                   </td>
                 </tr>
               ))}
