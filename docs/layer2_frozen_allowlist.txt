@@ -1,4 +1,0 @@
-# Optional allowlist for intentional edits to frozen Layer 1 contract surfaces.
-# Leave empty for standard Layer 2 development.
-#
-# Add exact repo-relative paths, one per line, only when a written exception exists.
