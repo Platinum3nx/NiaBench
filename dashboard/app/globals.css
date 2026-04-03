@@ -196,11 +196,17 @@ main {
   padding-left: 12px;
 }
 
+.table-scroll {
+  margin-top: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .leaderboard {
   width: 100%;
+  min-width: 720px;
   border-collapse: separate;
   border-spacing: 0;
-  margin-top: 8px;
 }
 
 .leaderboard th,
@@ -309,5 +315,10 @@ code {
 @media (max-width: 860px) {
   .panel-grid {
     grid-template-columns: 1fr;
+  }
+
+  .table-scroll {
+    margin: 8px -4px 0;
+    padding: 0 4px 4px;
   }
 }

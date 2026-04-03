@@ -125,7 +125,9 @@ Required harness behavior:
 
 The grading pipeline lives in [`grading`](grading).
 
-The project uses two grading signals:
+Current Layer 1 release mode is judge-only. Execution-backed scoring is deferred to a later layer.
+
+Target-state grading uses two signals:
 
 1. Execution, when the task is executable
 2. Rubric-based review for all tasks
@@ -138,7 +140,7 @@ Executable tasks should run in a clean sandbox so the benchmark can capture whet
 
 All tasks should also go through a judge pass with a clear rubric so partially correct answers can be distinguished from confidently outdated ones.
 
-Composite scoring should favor execution when execution is available, while still keeping the judge pass for nuance and traceability.
+When execution scoring is enabled in a later layer, composite scoring should favor execution when execution is available, while still keeping the judge pass for nuance and traceability.
 
 ## Failure Signals
 

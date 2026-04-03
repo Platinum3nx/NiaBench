@@ -159,10 +159,16 @@ def evaluate_task(
         context_chunks: list[Any] = []
         nia_query = build_nia_query(task)
         response_time_ms = None
+        nia_retrieval = {
+            "status": "dry_run",
+            "errors": [],
+            "endpoint_attempts": [],
+            "chunk_count": 0,
+        }
     else:
         if nia_client is None:
             raise ValueError("nia_client is required for non-dry runs")
-        context_chunks, nia_query, response_time_ms = nia_client.fetch_context(task)
+        context_chunks, nia_query, response_time_ms, nia_retrieval = nia_client.fetch_context(task)
 
     baseline_prompt, treatment_prompt = build_prompts(task, context_chunks)
 
@@ -264,6 +270,10 @@ def evaluate_task(
         "baseline_tokens_out": baseline_tokens_out,
         "baseline_request_id": baseline_request_id,
         "baseline_raw_response": baseline_raw,
+        "nia_retrieval_status": nia_retrieval.get("status"),
+        "nia_retrieval_errors": nia_retrieval.get("errors", []),
+        "nia_retrieval_endpoint_attempts": nia_retrieval.get("endpoint_attempts", []),
+        "nia_retrieval_chunk_count": nia_retrieval.get("chunk_count"),
         "nia_context_retrieved": [chunk.to_dict() for chunk in context_chunks],
         "nia_query_used": nia_query,
         "nia_response_time_ms": response_time_ms,

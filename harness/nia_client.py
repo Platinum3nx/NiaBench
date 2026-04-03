@@ -32,7 +32,9 @@ class NiaClient:
         self.cache_dir = cache_dir
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
-    def fetch_context(self, task: Task, *, limit: int = 6) -> tuple[list[NiaChunk], str, int | None]:
+    def fetch_context(
+        self, task: Task, *, limit: int = 6
+    ) -> tuple[list[NiaChunk], str, int | None, dict[str, Any]]:
         if not self.api_key:
             raise NiaClientError("Missing NIA_API_KEY")
         if not self.search_endpoint and not self.index_endpoint:
@@ -46,8 +48,17 @@ class NiaClient:
         if cache_path.exists():
             with cache_path.open("r", encoding="utf-8") as handle:
                 cached = json.load(handle)
-            return self._deserialize_chunks(cached["chunks"]), cached["query"], cached.get(
-                "response_time_ms"
+            retrieval = cached.get("retrieval")
+            if not isinstance(retrieval, dict):
+                retrieval = self._derive_retrieval_metadata(
+                    raw_responses=cached.get("raw_responses"),
+                    chunk_payload=cached.get("chunks"),
+                )
+            return (
+                self._deserialize_chunks(cached["chunks"]),
+                cached["query"],
+                cached.get("response_time_ms"),
+                retrieval,
             )
 
         started = time.perf_counter()
@@ -95,16 +106,21 @@ class NiaClient:
 
         elapsed_ms = int((time.perf_counter() - started) * 1000)
         trimmed_chunks = chunks[:limit]
+        retrieval = self._derive_retrieval_metadata(
+            raw_responses=raw_responses,
+            chunk_payload=[chunk.to_dict() for chunk in trimmed_chunks],
+        )
         cache_payload = {
             "query": query,
             "response_time_ms": elapsed_ms,
             "chunks": [chunk.to_dict() for chunk in trimmed_chunks],
             "raw_responses": raw_responses,
+            "retrieval": retrieval,
         }
         with cache_path.open("w", encoding="utf-8") as handle:
             json.dump(cache_payload, handle, indent=2)
 
-        return trimmed_chunks, query, elapsed_ms
+        return trimmed_chunks, query, elapsed_ms, retrieval
 
     def _cache_key(self, task: Task, query: str, limit: int) -> str:
         source = f"{task.id}|{task.library}|{task.version_introduced}|{query}|{limit}"
@@ -123,7 +139,7 @@ class NiaClient:
                 headers=headers,
                 timeout_seconds=60,
                 service_name="nia",
-                max_attempts=1,
+                max_attempts=3,
                 base_backoff_seconds=1.0,
                 max_backoff_seconds=16.0,
             )
@@ -220,6 +236,45 @@ class NiaClient:
             )
             for item in payload
         ]
+
+    def _derive_retrieval_metadata(
+        self,
+        *,
+        raw_responses: Any,
+        chunk_payload: Any,
+    ) -> dict[str, Any]:
+        endpoint_attempts: list[dict[str, Any]] = []
+        errors: list[str] = []
+
+        if isinstance(raw_responses, list):
+            for entry in raw_responses:
+                if not isinstance(entry, dict):
+                    continue
+                endpoint = entry.get("endpoint")
+                endpoint_label = endpoint if isinstance(endpoint, str) and endpoint else "unknown"
+                error = entry.get("error")
+                if isinstance(error, str) and error:
+                    endpoint_attempts.append(
+                        {"endpoint": endpoint_label, "status": "error", "error": error}
+                    )
+                    errors.append(f"{endpoint_label}: {error}")
+                elif "response" in entry:
+                    endpoint_attempts.append({"endpoint": endpoint_label, "status": "ok"})
+                else:
+                    endpoint_attempts.append({"endpoint": endpoint_label, "status": "unknown"})
+
+        chunk_count = len(chunk_payload) if isinstance(chunk_payload, list) else 0
+        if chunk_count > 0:
+            status = "ok" if not errors else "partial_error"
+        else:
+            status = "error" if errors else "empty"
+
+        return {
+            "status": status,
+            "errors": errors,
+            "endpoint_attempts": endpoint_attempts,
+            "chunk_count": chunk_count,
+        }
 
 
 def _optional_str(value: Any) -> str | None:

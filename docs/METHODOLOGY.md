@@ -22,7 +22,7 @@ Detailed explanation: Baseline runs receive only the task instructions. Treatmen
 
 Brief explanation: Retrieval is performed through Nia APIs and written to artifacts for later audit.
 
-Detailed explanation: For treatment runs, the harness retrieves documentation chunks and injects them into the prompt. Retrieved chunks, final prompts, model outputs, and error states are stored in result artifacts. If retrieval is transiently unavailable, the run is preserved with explicit retrieval status so failures are visible rather than silently dropped.
+Detailed explanation: For treatment runs, the harness retrieves documentation chunks and injects them into the prompt. Retrieved chunks, final prompts, model outputs, and retrieval metadata are stored in result artifacts. This includes explicit retrieval-status fields (`nia_retrieval_status`, `nia_retrieval_errors`, and endpoint-attempt metadata) so partial failures and empty-context runs are visible instead of silently masked.
 
 ## 5. Scoring (Current Layer 1)
 

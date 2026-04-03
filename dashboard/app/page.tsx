@@ -51,14 +51,13 @@ export default function HomePage() {
           indexed documentation context instead of relying on stale training knowledge.
         </p>
         <div className="hero-stat">
-          <strong className={deltaClass(summary.nonperfect_baseline_delta_pct)}>
-            {formatSignedPercent(summary.nonperfect_baseline_delta_pct)}
+          <strong className={deltaClass(summary.improvement_delta_pct)}>
+            {formatSignedPercent(summary.improvement_delta_pct)}
           </strong>
           <p>
-            improvement when the baseline scored below the rubric maximum
-            ({summary.nonperfect_baseline_count} of {evaluationsCount} evaluations,{" "}
-            {formatPercent(summary.nonperfect_baseline_without_nia)} &rarr;{" "}
-            {formatPercent(summary.nonperfect_baseline_with_nia)})
+            blended improvement across all evaluations ({formatPercent(summary.overall_without_nia)}{" "}
+            &rarr; {formatPercent(summary.overall_with_nia)} over {evaluationsCount} evaluations).
+            Segment deltas are shown below for headroom analysis.
           </p>
         </div>
 
@@ -73,6 +72,19 @@ export default function HomePage() {
             </p>
             <p>
               {formatPercent(perfectSharePct)} / {formatPercent(nonperfectSharePct)}
+            </p>
+          </article>
+          <article className="stat-card animate-in delay-1" style={{ animationDelay: '0.13s' }}>
+            <p>Non-perfect baseline delta</p>
+            <strong className={`metric-col ${deltaClass(summary.nonperfect_baseline_delta_pct)}`}>
+              {formatSignedPercent(summary.nonperfect_baseline_delta_pct)}
+            </strong>
+            <p>
+              {formatPercent(summary.nonperfect_baseline_without_nia)} &rarr;{" "}
+              {formatPercent(summary.nonperfect_baseline_with_nia)}
+            </p>
+            <p>
+              {summary.nonperfect_baseline_count} of {evaluationsCount} evaluations
             </p>
           </article>
           <article className="stat-card animate-in delay-1" style={{ animationDelay: '0.15s' }}>
@@ -125,61 +137,63 @@ export default function HomePage() {
       <section className="panel-grid">
         <article className="panel animate-in delay-2">
           <h2>Library leaderboard</h2>
-          <table className="leaderboard">
-            <thead>
-              <tr>
-                <th>Library</th>
-                <th>Tasks</th>
-                <th>Without Context</th>
-                <th>With Context</th>
-                <th>Delta</th>
-              </tr>
-            </thead>
-            <tbody>
-              {libraries.length === 0 ? (
+          <div className="table-scroll">
+            <table className="leaderboard">
+              <thead>
                 <tr>
-                  <td colSpan={5}>Scores will appear here after the first full evaluation run.</td>
+                  <th>Library</th>
+                  <th>Tasks</th>
+                  <th>Without Context</th>
+                  <th>With Context</th>
+                  <th>Delta</th>
                 </tr>
-              ) : (
-                libraries.map((library) => (
-                  <tr key={library.id}>
-                    <td>{library.label}</td>
-                    <td>{library.tasks}</td>
-                    
-                    <td className="metric-col">
-                      <div className="score-cell">
-                        <span style={{ width: '45px', display: 'inline-block' }}>{formatPercent(library.without_nia)}</span>
-                        <div className="score-bar-bg">
-                           <div className="score-bar-fill" style={{ width: library.without_nia ? `${library.without_nia}%` : '0%', background: 'var(--muted)' }} />
-                        </div>
-                      </div>
-                    </td>
-                    
-                    <td className="metric-col">
-                      <div className="score-cell">
-                        <span style={{ width: '45px', display: 'inline-block' }}>{formatPercent(library.with_nia)}</span>
-                        <div className="score-bar-bg">
-                           <div className="score-bar-fill" style={{ width: library.with_nia ? `${library.with_nia}%` : '0%' }} />
-                        </div>
-                      </div>
-                    </td>
-
-                    <td
-                      className={`metric-col ${
-                        library.delta_pct === null
-                          ? ""
-                          : library.delta_pct >= 0
-                            ? "delta-positive"
-                            : "delta-negative"
-                      }`}
-                    >
-                      {formatSignedPercent(library.delta_pct)}
-                    </td>
+              </thead>
+              <tbody>
+                {libraries.length === 0 ? (
+                  <tr>
+                    <td colSpan={5}>Scores will appear here after the first full evaluation run.</td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  libraries.map((library) => (
+                    <tr key={library.id}>
+                      <td>{library.label}</td>
+                      <td>{library.tasks}</td>
+                      
+                      <td className="metric-col">
+                        <div className="score-cell">
+                          <span style={{ width: '45px', display: 'inline-block' }}>{formatPercent(library.without_nia)}</span>
+                          <div className="score-bar-bg">
+                             <div className="score-bar-fill" style={{ width: library.without_nia ? `${library.without_nia}%` : '0%', background: 'var(--muted)' }} />
+                          </div>
+                        </div>
+                      </td>
+                      
+                      <td className="metric-col">
+                        <div className="score-cell">
+                          <span style={{ width: '45px', display: 'inline-block' }}>{formatPercent(library.with_nia)}</span>
+                          <div className="score-bar-bg">
+                             <div className="score-bar-fill" style={{ width: library.with_nia ? `${library.with_nia}%` : '0%' }} />
+                          </div>
+                        </div>
+                      </td>
+
+                      <td
+                        className={`metric-col ${
+                          library.delta_pct === null
+                            ? ""
+                            : library.delta_pct >= 0
+                              ? "delta-positive"
+                              : "delta-negative"
+                        }`}
+                      >
+                        {formatSignedPercent(library.delta_pct)}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </article>
 
         <article className="panel animate-in delay-2" style={{ animationDelay: '0.3s' }}>

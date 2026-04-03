@@ -4,7 +4,9 @@ export default function MethodologyPage() {
       <p className="eyebrow">Methodology</p>
       <h1>NiaBench Methodology</h1>
       <p className="hero-copy">
-        Our evaluation framework is designed for maximum transparency and reproducibility. We employ a rigorous, layered protocol to measure the exact impact of fresh context retrieval on foundation models, isolating variables to ensure highly accurate, auditable capability assessments.
+        Our evaluation framework prioritizes transparency and reproducibility. Layer 1 estimates
+        the impact of fresh context retrieval by isolating variables and preserving auditable
+        artifacts for every run.
       </p>
 
       <article className="panel">
