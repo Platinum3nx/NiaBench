@@ -1,6 +1,6 @@
 # Deployment and Launch Readiness
 
-Last updated: Thursday, April 2, 2026 early morning ET
+Last updated: Friday, April 3, 2026 afternoon ET
 
 ## Canonical Launch Artifacts
 
@@ -33,9 +33,9 @@ npx vercel deploy --prebuilt --prod --yes --cwd dashboard
 
 Latest deployment evidence:
 
-- Deployment ID: `dpl_69ZpJ56bM3WFq58Wtawh2ubPzRQJ`
-- Inspector URL: `https://vercel.com/rare-tech/dashboard/69ZpJ56bM3WFq58Wtawh2ubPzRQJ`
-- Deployment URL: `https://dashboard-46i21bqj1-rare-tech.vercel.app`
+- Deployment ID: `dpl_7yg2xBL3oq4BA76w3SVg8f1TbZ6u`
+- Inspector URL: `https://vercel.com/rare-tech/dashboard/7yg2xBL3oq4BA76w3SVg8f1TbZ6u`
+- Deployment URL: `https://dashboard-qf1flvag7-rare-tech.vercel.app`
 - Alias: `https://dashboard-rare-tech.vercel.app`
 - `vercel inspect` status: `Ready`
 - Access note: deployment protection is disabled (`ssoProtection: null` on project config) and both deployment URL and alias return `HTTP 200`.

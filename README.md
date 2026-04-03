@@ -4,7 +4,7 @@ Context retrieval benchmark for AI coding agents.
 
 NiaBench measures how much coding models improve when they get fresh, indexed documentation context for fast-moving libraries instead of relying on stale training data alone.
 
-## Current Status (April 2, 2026 early morning ET)
+## Current Status (Friday, April 3, 2026 afternoon ET)
 
 The locked 30-task pilot has now been run live on both pinned models in judge-only mode. The latest aggregate in `results/scores.json` contains:
 
@@ -34,7 +34,7 @@ To keep progress unblocked while infrastructure lands:
 
 - `dataset/tasks_raw.json` is now the full validated raw task pool (`324` tasks) sourced from the completed OpenClaw run
 - `dataset/tasks.json` remains the locked pilot used for the current public benchmark build
-- scoring is currently treated as judge-first / judge-only for the active sprint slice
+- scoring is currently judge-only for the active sprint slice
 - full sandbox-backed execution is explicitly deferred for this sprint slice
 - smoke readiness requires a non-empty validated smoke fixture
 - pilot readiness requires a locked non-empty validated `dataset/tasks.json`

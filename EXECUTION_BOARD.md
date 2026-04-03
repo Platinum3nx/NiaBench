@@ -1,7 +1,7 @@
 # NiaBench Execution Board
 
 Status: Launch Track  
-Last updated: Thursday, April 2, 2026 early morning ET  
+Last updated: Friday, April 3, 2026 afternoon ET  
 Engineering target: Thursday, April 2, 2026 morning  
 Dashboard target: Thursday, April 2, 2026 morning  
 Current sprint plan: [`docs/CURRENT_SPRINT_PLAN.md`](/Users/arjunmalghan/NiaBench/docs/CURRENT_SPRINT_PLAN.md)
@@ -19,7 +19,7 @@ Operating principle: keep the benchmark narrow, deterministic, and inspectable s
 - The full OpenClaw raw corpus is now synced locally at `dataset/tasks_raw.json` with `324` validator-passing tasks; it is useful evidence and expansion material, but it is no longer a blocker for a Thursday, April 2, 2026 morning launch.
 - A pilot candidate selected from the full raw corpus exists, but it differs materially from the current locked pilot and would require reruns if adopted tonight.
 - Full sandbox-backed execution remains deferred for this sprint slice.
-- Judge-first / judge-only scoring mode is the active bridge until sandbox integration lands.
+- Judge-only scoring mode is the active bridge until sandbox integration lands.
 - Empty task lists do not count as readiness.
 - Smoke readiness requires a non-empty validator-passing smoke fixture such as `dataset/tasks_smoke.json`.
 - Pilot readiness requires a non-empty validator-passing locked benchmark file.
@@ -88,8 +88,8 @@ Operating principle: keep the benchmark narrow, deterministic, and inspectable s
 - Vercel project linked: `rare-tech/dashboard`
 - Build verification: `npx vercel build --yes --cwd dashboard` -> success (`status: ok`)
 - Deployment verification: `npx vercel deploy --prebuilt --prod --yes --cwd dashboard` -> ready production deployment
-- Inspector URL: `https://vercel.com/rare-tech/dashboard/69ZpJ56bM3WFq58Wtawh2ubPzRQJ`
-- Deployment URL: `https://dashboard-46i21bqj1-rare-tech.vercel.app`
+- Inspector URL: `https://vercel.com/rare-tech/dashboard/7yg2xBL3oq4BA76w3SVg8f1TbZ6u`
+- Deployment URL: `https://dashboard-qf1flvag7-rare-tech.vercel.app`
 - Alias: `https://dashboard-rare-tech.vercel.app`
 - Access note: project deployment protection has been disabled (`ssoProtection: null`), and alias access is public (`HTTP 200`).
 

@@ -35,7 +35,7 @@ When retrieval is rate-limited or transiently unavailable, the harness records t
 
 ## Grading
 
-Current sprint mode is judge-first/judge-only so pilot artifacts remain usable while sandbox execution is being integrated.
+Current sprint mode is judge-only so pilot artifacts remain usable while sandbox execution is being integrated.
 
 - Judge grading is rubric-aware and returns baseline/treatment scores with rationales.
 - Composite scoring is currently derived from judge scores in judge-only mode.

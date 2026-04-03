@@ -1,8 +1,10 @@
 # Work Not Blocked By OpenClaw
 
-Status: Active  
+Status: Archived (historical planning memo)  
 Context date: Wednesday, April 1, 2026  
 Purpose: identify the highest-value NiaBench work that can move forward immediately without waiting for the current OpenClaw run to finish.
+
+Note: this document is preserved as a historical execution memo. For current benchmark commands and canonical aggregate paths, use `README.md`, `docs/DEPLOYMENT.md`, and `docs/METHODOLOGY.md`.
 
 ## Core Point
 

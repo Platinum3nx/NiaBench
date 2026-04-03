@@ -185,9 +185,9 @@ export default function HomePage() {
         <article className="panel animate-in delay-2" style={{ animationDelay: '0.3s' }}>
           <h2>Method</h2>
           <p>
-            Each task is run twice with identical model parameters: once without external
-            context and once with a clearly labeled block of current documentation chunks
-            retrieved directly from Nia&apos;s search and index APIs.
+            Each task is run twice with the same model and runtime settings: once without
+            external context and once with a clearly labeled block of current documentation
+            chunks retrieved directly from Nia&apos;s search and index APIs.
           </p>
           <p>
             Raw prompts, retrieved context, and model outputs are all written to disk so the

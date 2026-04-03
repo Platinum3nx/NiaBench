@@ -1,7 +1,7 @@
 # NiaBench Current Sprint Plan
 
-Status: Active
-Last updated: Wednesday, April 1, 2026
+Status: Completed
+Last updated: Friday, April 3, 2026
 Primary objective: Add segmented analysis to the dashboard so the benchmark transparently shows both the overall delta and the per-segment deltas, without misrepresenting the data.
 
 ## Motivation
