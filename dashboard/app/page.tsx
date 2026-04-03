@@ -196,7 +196,7 @@ export default function HomePage() {
           <div className="callout" style={{ marginTop: '24px' }}>
             Current status: this dashboard renders committed pilot scores from
             <code> results/scores.json</code> (generated from
-            <code> results/raw_curated/combined</code>). Scoring for this sprint is judge-only
+            <code> results/raw_curated/combined</code>). Current Layer 1 scoring is judge-only
             while sandbox execution remains deferred.
           </div>
         </article>

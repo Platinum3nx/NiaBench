@@ -1,64 +1,55 @@
 # NiaBench Methodology
 
-## Benchmark framing
+## 1. Benchmark Objective
 
-NiaBench is a with-context versus without-context benchmark for coding models operating on fast-moving libraries. It is not a general coding benchmark and it is not a model leaderboard. The comparison is always the same model, same parameters, same task, with the only variable being whether fresh documentation context is injected.
+Brief explanation: NiaBench measures the causal effect of fresh documentation context on coding-task performance for fast-moving libraries.
 
-## Dataset construction
+Detailed explanation: NiaBench is an A/B benchmark, not a general model leaderboard. For each task, we compare the same model on the same prompt twice: once without retrieved docs context and once with retrieved docs context. This isolates the contribution of context retrieval rather than differences between models.
 
-The dataset focuses on high-churn libraries where stale model knowledge predictably leads to deprecated imports, removed methods, outdated config shapes, and wrong type signatures. Every task records:
+## 2. Dataset Design
 
-- the version boundary
-- the deprecated pattern
-- the correct current pattern
-- why a model would confidently fail without fresh context
+Brief explanation: Tasks are version-sensitive migration and usage problems where stale knowledge causes realistic failures.
 
-The dataset quality gate is strict by design. Weak or ambiguous tasks are excluded rather than padded into the benchmark.
+Detailed explanation: Each task records the version boundary, deprecated pattern, correct current pattern, and a short rationale for why a model might fail without up-to-date documentation. The public Layer 1 set is `dataset/tasks.json` with `30` tasks across `20` libraries. A larger raw corpus is retained separately in `dataset/tasks_raw.json` for future expansion.
 
-Current sprint state:
+## 3. Experimental Conditions
 
-- `dataset/tasks_raw.json` now contains the full synced OpenClaw raw corpus (`324` validator-passing tasks)
-- `dataset/tasks.json` is locked at `30` validator-passing pilot tasks with all `20` tracked libraries represented, `10` libraries represented twice, and balanced easy/medium/hard difficulty buckets
-- the current public benchmark build uses the locked pilot, not the entire raw corpus directly
-- founder-facing aggregate regeneration is locked to `results/raw_curated/combined`
+Brief explanation: Each task is run in baseline and treatment modes under matched runtime settings.
 
-## Eval harness
+Detailed explanation: Baseline runs receive only the task instructions. Treatment runs receive the same task instructions plus a labeled retrieved-context block (`CURRENT DOCUMENTATION CONTEXT (retrieved via Nia)`) appended in the system prompt. Model ID, temperature, and other runtime controls are held fixed within each baseline/treatment pair.
 
-For each task, the harness makes two model calls:
+## 4. Retrieval And Execution Flow
 
-1. Baseline: task description only
-2. Treatment: identical task, plus a clearly labeled `CURRENT DOCUMENTATION CONTEXT (retrieved via Nia)` block injected into the system prompt
+Brief explanation: Retrieval is performed through Nia APIs and written to artifacts for later audit.
 
-The harness calls Nia's direct API endpoints (not the MCP server) so retrieved context can be logged verbatim and audited later. The full prompt sent to the model is written to the result file for both baseline and treatment runs.
+Detailed explanation: For treatment runs, the harness retrieves documentation chunks and injects them into the prompt. Retrieved chunks, final prompts, model outputs, and error states are stored in result artifacts. If retrieval is transiently unavailable, the run is preserved with explicit retrieval status so failures are visible rather than silently dropped.
 
-When retrieval is rate-limited or transiently unavailable, the harness records the retrieval error in run artifacts and continues the task with an empty context block rather than entering uncontrolled retry loops.
+## 5. Scoring (Current Layer 1)
 
-## Grading
+Brief explanation: Current scoring is judge-only; sandbox execution is deferred.
 
-Current sprint mode is judge-only so pilot artifacts remain usable while sandbox execution is being integrated.
+Detailed explanation: Layer 1 uses rubric-aware judge scoring for baseline and treatment outputs. Composite scores are derived from judge outputs for this release. Sandbox-backed execution scoring is intentionally deferred and will be reintroduced in a later layer as an additional signal.
 
-- Judge grading is rubric-aware and returns baseline/treatment scores with rationales.
-- Composite scoring is currently derived from judge scores in judge-only mode.
-- Sandbox execution remains an explicit deferred integration point for executable tasks in this sprint slice.
+## 6. Reliability And Auditability
 
-## Reproducibility principles
+Brief explanation: NiaBench is designed so every claim is traceable to concrete artifacts.
 
-NiaBench is only useful if it is trusted. That means:
+Detailed explanation: Run artifacts include prompt text, retrieved context, model responses, and grading outputs. Aggregates are regenerated from raw artifacts using deterministic scripts and validated against schema contracts before dashboard publish. This keeps metric claims reproducible and reviewable.
 
-- prompts are logged
-- retrieved context is logged
-- judge prompt/response traces are logged
-- failures are stored alongside successful runs
-- reruns are targeted and auditable
+## 7. Interpreting Reported Deltas
 
-## Current live pilot snapshot
+Brief explanation: Segment deltas carry different meaning and should be read together.
 
-Current aggregate (`results/scores.json`) from the locked 30-task pilot on both pinned models:
+Detailed explanation: `nonperfect_baseline_delta_pct` captures improvement where baseline rows had room to improve. `perfect_baseline_delta_pct` captures movement on rows where baseline was already perfect; negative values indicate context occasionally introduced distraction. `improvement_delta_pct` is the blended effect across all rows.
 
-- evaluations: `60` (`30` unique tasks x `2` models)
-- libraries covered: `20`
-- overall without Nia: `75.0`
-- overall with Nia: `85.833333`
-- delta: `+10.833333`
+## 8. Current Layer 1 Snapshot
 
-The expanded raw corpus is retained as provenance and future benchmark expansion material, but the release artifact for this sprint slice remains the locked 30-task pilot plus its corresponding run artifacts and aggregate.
+Current aggregate (`results/scores.json`):
+
+- Evaluations: `60` (`30` tasks x `2` models)
+- Libraries covered: `20`
+- `overall_without_nia`: `75.0`
+- `overall_with_nia`: `85.833333`
+- `improvement_delta_pct`: `+10.833333`
+- `nonperfect_baseline_delta_pct`: `+47.916667`
+- `perfect_baseline_delta_pct`: `-13.888889`

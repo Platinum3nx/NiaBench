@@ -93,7 +93,7 @@ export default function MethodologyPage() {
         <h2>5. Grading and Reliability</h2>
         <h3>Quick Read</h3>
         <p className="method-brief">
-          Current scoring is judge-only for this sprint, with strict output validation and
+          Current scoring is judge-only for Layer 1, with strict output validation and
           reproducible artifacts.
         </p>
         <h3>Detailed Explanation</h3>
@@ -103,7 +103,7 @@ export default function MethodologyPage() {
           files and score files to reduce silent data drift.
         </p>
         <p>
-          Sandbox execution remains a deferred integration point in the current sprint scope. This
+          Sandbox execution remains a deferred integration point in the current Layer 1 scope. This
           limitation is documented so readers understand exactly what the current results represent
           and what they do not represent yet.
         </p>

@@ -1,4 +1,4 @@
-# OpenClaw Brief
+# Raw Corpus Generation Brief
 
 Use this prompt for bulk task generation.
 
@@ -38,12 +38,6 @@ Libraries:
 Quality standard:
 - Only include tasks where a model trained before the change would confidently produce the wrong answer.
 - Exclude ambiguous changes, stylistic preferences, and weak migrations.
-- Deprecated pattern and correct pattern must both be explicit.
-- Use natural developer language, not exam language.
-- Mark executable=true only if a clean reference solution can be run in an isolated environment.
-- Minimum 8 tasks per library unless the library genuinely has fewer strong candidates.
-
-Output:
-- Save the raw output to /dataset/tasks_raw.json
-- Return a JSON array only
+- Each task must have a concrete before/after pattern.
+- Keep prompts realistic, concise, and implementation-focused.
 ```

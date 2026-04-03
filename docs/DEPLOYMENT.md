@@ -1,29 +1,39 @@
-# Deployment and Launch Readiness
+# Deployment and Release Readiness
 
-Last updated: Friday, April 3, 2026 afternoon ET
+## 1. Canonical Artifacts
 
-## Canonical Launch Artifacts
+Use this artifact set for Layer 1 release and reruns:
 
-- Locked pilot tasks: `dataset/tasks.json` (`30` validator-passing tasks)
-- Canonical aggregate input: `results/raw_curated/combined`
-- Published aggregate output: `results/scores.json`
-- Dashboard build target: `dashboard/` (Next.js static prerender)
+- Tasks: `dataset/tasks.json`
+- Aggregate input: `results/raw_curated/combined`
+- Aggregate output: `results/scores.json`
+- Dashboard app: `dashboard/`
 
-Founder-facing aggregation command:
+Regenerate and validate scores:
 
 ```bash
 python3 scripts/aggregate.py --input results/raw_curated/combined --output results/scores.json
 python3 scripts/validate_scores.py results/scores.json
 ```
 
-## Deployment Target
+## 2. Dashboard Build Validation
 
-- Platform: Vercel
-- Project: `rare-tech/dashboard`
-- Working directory: `dashboard`
-- Deploy path: prebuilt artifact deployment from `.vercel/output`
+Run before any deployment:
 
-Commands:
+```bash
+python3 scripts/validate_tasks.py dataset/tasks.json
+python3 scripts/validate_scores.py results/scores.json
+cd dashboard
+npm install
+npm run lint
+npm run build
+```
+
+Expected result: all commands exit `0` with no validation or build errors.
+
+## 3. Vercel Deployment (Example)
+
+If you deploy with Vercel, target the `dashboard/` directory:
 
 ```bash
 npx vercel pull --yes --environment preview --cwd dashboard
@@ -31,28 +41,10 @@ npx vercel build --yes --prod --cwd dashboard
 npx vercel deploy --prebuilt --prod --yes --cwd dashboard
 ```
 
-Latest deployment evidence:
+After deploy, verify that the configured preview/production URL returns `HTTP 200`.
 
-- Deployment ID: `dpl_7yg2xBL3oq4BA76w3SVg8f1TbZ6u`
-- Inspector URL: `https://vercel.com/rare-tech/dashboard/7yg2xBL3oq4BA76w3SVg8f1TbZ6u`
-- Deployment URL: `https://dashboard-qf1flvag7-rare-tech.vercel.app`
-- Alias: `https://dashboard-rare-tech.vercel.app`
-- `vercel inspect` status: `Ready`
-- Access note: deployment protection is disabled (`ssoProtection: null` on project config) and both deployment URL and alias return `HTTP 200`.
+## 4. Release Scope Notes
 
-## Final Validation Trio (Launch-Safe Pass)
-
-```bash
-python3 scripts/validate_tasks.py dataset/tasks.json
-python3 scripts/validate_scores.py results/scores.json
-cd dashboard && npm run build
-```
-
-Expected result: all commands exit `0` with no contract or build errors.
-
-## Scope Statement For This Release
-
-- This is the first credible public benchmark build.
-- Scoring is intentionally judge-only for this sprint slice.
-- Sandbox-backed scoring is deferred and should be added in the next integration phase.
-- The full `dataset/tasks_raw.json` OpenClaw corpus is retained as provenance and expansion material, not a blocker for this launch artifact.
+- Layer 1 scoring is judge-only.
+- Sandbox-backed scoring is deferred to a later layer.
+- The larger raw task corpus is retained for future expansion, but the release artifact set above is the source of truth for current published metrics.
