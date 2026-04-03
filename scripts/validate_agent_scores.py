@@ -20,6 +20,14 @@ SUMMARY_FIELDS = {
     "run_level_judge_error_rate",
     "nia_usage_rate",
     "avg_nia_calls_per_nia_run",
+    "task_delta_ties",
+    "task_delta_nia_positive",
+    "task_delta_no_retrieval_positive",
+    "pairwise_comparisons",
+    "pairwise_nia_wins",
+    "pairwise_ties",
+    "pairwise_no_retrieval_wins",
+    "pairwise_tie_rate",
     "unique_tasks",
     "total_runs",
     "model_provider",
@@ -39,8 +47,13 @@ CONDITION_FIELDS = {
     "run_level_timeout_rate",
     "run_level_no_artifact_rate",
     "run_level_judge_error_rate",
+    "run_level_retrieval_error_rate",
+    "run_level_workspace_tool_error_rate",
+    "run_level_nia_tool_error_rate",
     "avg_tool_calls_per_run",
+    "avg_tool_error_calls_per_run",
     "avg_nia_calls_per_run",
+    "avg_nia_tool_error_calls_per_run",
     "nia_usage_rate",
     "avg_nia_calls_per_nia_run",
 }
@@ -51,8 +64,22 @@ TASK_FIELDS = {
     "by_condition",
     "delta_completed_only_pct",
     "delta_crash_aware_pct",
+    "pairwise_comparisons",
+    "pairwise_nia_wins",
+    "pairwise_ties",
+    "pairwise_no_retrieval_wins",
 }
-LIBRARY_FIELDS = {"library", "tasks", "by_condition", "delta_completed_only_pct", "delta_crash_aware_pct"}
+LIBRARY_FIELDS = {
+    "library",
+    "tasks",
+    "by_condition",
+    "delta_completed_only_pct",
+    "delta_crash_aware_pct",
+    "pairwise_comparisons",
+    "pairwise_nia_wins",
+    "pairwise_ties",
+    "pairwise_no_retrieval_wins",
+}
 
 CONDITIONS = {"no_retrieval_agent", "nia_agent"}
 
@@ -110,15 +137,25 @@ def validate_payload(payload: dict[str, Any]) -> list[str]:
             validate_number_or_null(summary, "delta_crash_aware_pct", errors, "summary")
             validate_number_or_null(summary, "nia_usage_rate", errors, "summary")
             validate_number_or_null(summary, "avg_nia_calls_per_nia_run", errors, "summary")
+            validate_number_or_null(summary, "pairwise_tie_rate", errors, "summary")
             validate_percent_map(summary, "run_level_completion_rate", errors)
             validate_percent_map(summary, "run_level_crash_rate", errors)
             validate_percent_map(summary, "run_level_timeout_rate", errors)
             validate_percent_map(summary, "run_level_no_artifact_rate", errors)
             validate_percent_map(summary, "run_level_judge_error_rate", errors)
-            if not isinstance(summary.get("unique_tasks"), int):
-                errors.append("summary.unique_tasks must be an integer")
-            if not isinstance(summary.get("total_runs"), int):
-                errors.append("summary.total_runs must be an integer")
+            for field in (
+                "task_delta_ties",
+                "task_delta_nia_positive",
+                "task_delta_no_retrieval_positive",
+                "pairwise_comparisons",
+                "pairwise_nia_wins",
+                "pairwise_ties",
+                "pairwise_no_retrieval_wins",
+                "unique_tasks",
+                "total_runs",
+            ):
+                if not isinstance(summary.get(field), int):
+                    errors.append(f"summary.{field} must be an integer")
 
     conditions = payload.get("conditions")
     if not isinstance(conditions, list):
@@ -150,8 +187,13 @@ def validate_payload(payload: dict[str, Any]) -> list[str]:
                 "run_level_timeout_rate",
                 "run_level_no_artifact_rate",
                 "run_level_judge_error_rate",
+                "run_level_retrieval_error_rate",
+                "run_level_workspace_tool_error_rate",
+                "run_level_nia_tool_error_rate",
                 "avg_tool_calls_per_run",
+                "avg_tool_error_calls_per_run",
                 "avg_nia_calls_per_run",
+                "avg_nia_tool_error_calls_per_run",
                 "nia_usage_rate",
                 "avg_nia_calls_per_nia_run",
             ):
@@ -178,6 +220,14 @@ def validate_payload(payload: dict[str, Any]) -> list[str]:
                 errors.append(f"{prefix}.tasks must be an integer")
             validate_number_or_null(item, "delta_completed_only_pct", errors, prefix)
             validate_number_or_null(item, "delta_crash_aware_pct", errors, prefix)
+            for field in (
+                "pairwise_comparisons",
+                "pairwise_nia_wins",
+                "pairwise_ties",
+                "pairwise_no_retrieval_wins",
+            ):
+                if not isinstance(item.get(field), int):
+                    errors.append(f"{prefix}.{field} must be an integer")
             validate_by_condition_map(item.get("by_condition"), errors, f"{prefix}.by_condition")
 
     tasks = payload.get("tasks")
@@ -207,6 +257,14 @@ def validate_payload(payload: dict[str, Any]) -> list[str]:
                 errors.append(f"{prefix}.difficulty must be a string")
             validate_number_or_null(item, "delta_completed_only_pct", errors, prefix)
             validate_number_or_null(item, "delta_crash_aware_pct", errors, prefix)
+            for field in (
+                "pairwise_comparisons",
+                "pairwise_nia_wins",
+                "pairwise_ties",
+                "pairwise_no_retrieval_wins",
+            ):
+                if not isinstance(item.get(field), int):
+                    errors.append(f"{prefix}.{field} must be an integer")
             validate_by_condition_map(item.get("by_condition"), errors, f"{prefix}.by_condition")
 
     return errors

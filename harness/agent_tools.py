@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
 import subprocess
@@ -388,6 +389,10 @@ class Layer2NiaSearchTool:
         self.api_key = api_key
         self.search_endpoint = search_endpoint
         self.index_endpoint = index_endpoint
+        self.cache_dir = (
+            Path(__file__).resolve().parent.parent / "results" / "cache" / "layer2_nia_tool"
+        )
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
 
     def search_docs(self, *, query: str, library: str, version: str, top_k: int = 5) -> dict[str, Any]:
         if not self.api_key:
@@ -401,6 +406,27 @@ class Layer2NiaSearchTool:
         attempted_endpoints: list[str] = []
         request_ids: list[str] = []
         modes_tried: list[str] = []
+        endpoint_errors: list[str] = []
+
+        cache_key = self._cache_key(query=query, library=library, version=version, top_k=top_k)
+        cached_results = self._load_cache(cache_key)
+        if cached_results:
+            return {
+                "query": query,
+                "library": library,
+                "version": version,
+                "top_k": top_k,
+                "results": cached_results[:top_k],
+                "provider_metadata": {
+                    "attempted_endpoints": attempted_endpoints,
+                    "request_ids": request_ids,
+                    "modes_tried": modes_tried,
+                    "response_time_ms": int((time.perf_counter() - started) * 1000),
+                    "cache_mode": "exact",
+                    "degraded": False,
+                    "endpoint_errors": endpoint_errors,
+                },
+            }
 
         payload = {
             "query": query,
@@ -412,7 +438,6 @@ class Layer2NiaSearchTool:
 
         search_payload: dict[str, Any] | None = None
         index_payload: dict[str, Any] | None = None
-        last_error: str | None = None
 
         if self.search_endpoint:
             attempted_endpoints.append(self.search_endpoint)
@@ -426,10 +451,10 @@ class Layer2NiaSearchTool:
                     request_ids.append(search_request_id)
                 modes_tried.extend(attempted_modes)
             except AgentToolError as exc:
-                last_error = str(exc)
+                endpoint_errors.append(str(exc))
 
         search_results = _extract_nia_results(search_payload) if search_payload else []
-        if not search_results and self.index_endpoint:
+        if not search_results and not self.search_endpoint and self.index_endpoint:
             attempted_endpoints.append(self.index_endpoint)
             try:
                 index_payload, index_request_id, attempted_modes = self._post_with_mode_fallback(
@@ -441,14 +466,27 @@ class Layer2NiaSearchTool:
                     request_ids.append(index_request_id)
                 modes_tried.extend(attempted_modes)
             except AgentToolError as exc:
-                last_error = str(exc)
+                endpoint_errors.append(str(exc))
 
         index_results = _extract_nia_results(index_payload) if index_payload else []
         combined = (search_results + index_results)[:top_k]
-        duration_ms = int((time.perf_counter() - started) * 1000)
+        cache_mode = "none"
+        if combined:
+            self._write_cache(
+                key=cache_key,
+                query=query,
+                library=library,
+                version=version,
+                top_k=top_k,
+                results=combined,
+            )
+        else:
+            scoped_cache_results = self._load_scoped_fallback(library=library, version=version)
+            if scoped_cache_results:
+                combined = scoped_cache_results[:top_k]
+                cache_mode = "library_version_fallback"
 
-        if not combined and last_error:
-            raise AgentToolError(last_error)
+        duration_ms = int((time.perf_counter() - started) * 1000)
 
         return {
             "query": query,
@@ -461,8 +499,90 @@ class Layer2NiaSearchTool:
                 "request_ids": request_ids,
                 "modes_tried": modes_tried,
                 "response_time_ms": duration_ms,
+                "cache_mode": cache_mode,
+                "degraded": not bool(combined),
+                "endpoint_errors": endpoint_errors,
             },
         }
+
+    def _cache_key(self, *, query: str, library: str, version: str, top_k: int) -> str:
+        source = f"{query}|{library}|{version}|{top_k}"
+        return hashlib.sha256(source.encode("utf-8")).hexdigest()
+
+    def _cache_path(self, key: str) -> Path:
+        return self.cache_dir / f"{key}.json"
+
+    def _load_cache(self, key: str) -> list[dict[str, Any]] | None:
+        path = self._cache_path(key)
+        if not path.exists():
+            return None
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return None
+        if not isinstance(payload, dict):
+            return None
+        results = payload.get("results")
+        if not isinstance(results, list):
+            return None
+        rows: list[dict[str, Any]] = []
+        for item in results:
+            chunk = _coerce_nia_chunk(item)
+            if chunk is not None:
+                rows.append(chunk)
+        return rows or None
+
+    def _load_scoped_fallback(self, *, library: str, version: str) -> list[dict[str, Any]] | None:
+        latest_results: list[dict[str, Any]] | None = None
+        latest_mtime: float | None = None
+        for path in self.cache_dir.glob("*.json"):
+            try:
+                payload = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            if not isinstance(payload, dict):
+                continue
+            if payload.get("library") != library or payload.get("version") != version:
+                continue
+            results = payload.get("results")
+            if not isinstance(results, list):
+                continue
+            rows: list[dict[str, Any]] = []
+            for item in results:
+                chunk = _coerce_nia_chunk(item)
+                if chunk is not None:
+                    rows.append(chunk)
+            if not rows:
+                continue
+            mtime = path.stat().st_mtime
+            if latest_mtime is None or mtime > latest_mtime:
+                latest_mtime = mtime
+                latest_results = rows
+        return latest_results
+
+    def _write_cache(
+        self,
+        *,
+        key: str,
+        query: str,
+        library: str,
+        version: str,
+        top_k: int,
+        results: list[dict[str, Any]],
+    ) -> None:
+        payload = {
+            "generated_at": _now_iso(),
+            "query": query,
+            "library": library,
+            "version": version,
+            "top_k": top_k,
+            "results": results,
+        }
+        path = self._cache_path(key)
+        try:
+            path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        except OSError:
+            return
 
     def _post_with_mode_fallback(
         self,
@@ -510,7 +630,7 @@ class Layer2NiaSearchTool:
                 headers=headers,
                 timeout_seconds=60,
                 service_name="nia",
-                max_attempts=3,
+                max_attempts=1,
                 base_backoff_seconds=1.0,
                 max_backoff_seconds=8.0,
             )
@@ -594,8 +714,6 @@ def _is_retryable_mode_error(message: str) -> bool:
         for marker in (
             "status=422",
             "status=403",
-            "status=429",
-            "rate_limit_exceeded",
             "union_tag_invalid",
             "union_tag_not_found",
         )

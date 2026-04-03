@@ -47,7 +47,7 @@ def main() -> int:
     conditions = build_condition_rows(run_rows)
     tasks = build_task_rows(run_rows, task_meta)
     libraries = build_library_rows(tasks)
-    summary = build_summary(run_rows, conditions)
+    summary = build_summary(run_rows, conditions, tasks)
 
     payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -132,6 +132,18 @@ def normalize_run_row(payload: dict[str, Any], *, source_file: Path) -> dict[str
         for item in tool_call_list
         if isinstance(item, dict) and item.get("name") == "nia_search_docs"
     )
+    tool_error_calls = sum(
+        1
+        for item in tool_call_list
+        if isinstance(item, dict) and item.get("status") == "error"
+    )
+    nia_tool_error_calls = sum(
+        1
+        for item in tool_call_list
+        if isinstance(item, dict)
+        and item.get("name") == "nia_search_docs"
+        and item.get("status") == "error"
+    )
 
     return {
         "task_id": task_id,
@@ -146,8 +158,10 @@ def normalize_run_row(payload: dict[str, Any], *, source_file: Path) -> dict[str
         "crash_aware_score_pct": crash_aware_score_pct,
         "pass_bool": bool(scores.get("pass_bool")) if isinstance(scores.get("pass_bool"), bool) else None,
         "tool_calls": len(tool_call_list),
+        "tool_error_calls": tool_error_calls,
         "nia_calls": nia_calls,
         "nia_used": nia_calls > 0,
+        "nia_tool_error_calls": nia_tool_error_calls,
         "model_provider": payload.get("model_provider"),
         "model": payload.get("model"),
         "judge_provider": payload.get("judge_provider"),
@@ -214,8 +228,28 @@ def build_condition_rows(run_rows: list[dict[str, Any]]) -> list[dict[str, Any]]
                     sum(1 for row in condition_runs if row["status"] == "judge_error"),
                     len(condition_runs),
                 ),
+                "run_level_retrieval_error_rate": rate(
+                    sum(1 for row in condition_runs if row["status"] == "retrieval_error"),
+                    len(condition_runs),
+                ),
+                "run_level_workspace_tool_error_rate": rate(
+                    sum(1 for row in condition_runs if row["status"] == "workspace_tool_error"),
+                    len(condition_runs),
+                ),
+                "run_level_nia_tool_error_rate": rate(
+                    sum(1 for row in condition_runs if row["nia_tool_error_calls"] > 0),
+                    len(condition_runs),
+                ),
                 "avg_tool_calls_per_run": mean([float(row["tool_calls"]) for row in condition_runs]) or 0.0,
+                "avg_tool_error_calls_per_run": mean(
+                    [float(row["tool_error_calls"]) for row in condition_runs]
+                )
+                or 0.0,
                 "avg_nia_calls_per_run": mean([float(row["nia_calls"]) for row in condition_runs]) or 0.0,
+                "avg_nia_tool_error_calls_per_run": mean(
+                    [float(row["nia_tool_error_calls"]) for row in condition_runs]
+                )
+                or 0.0,
                 "nia_usage_rate": rate(len(nia_runs), len(condition_runs)),
                 "avg_nia_calls_per_nia_run": mean([float(row["nia_calls"]) for row in nia_runs]),
             }
@@ -258,7 +292,10 @@ def build_task_rows(
     task_meta: dict[str, dict[str, str]],
 ) -> list[dict[str, Any]]:
     task_condition_stats = compute_task_condition_stats(run_rows)
-    task_ids = sorted({str(row["task_id"]) for row in run_rows})
+    task_runs_by_id: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in run_rows:
+        task_runs_by_id[str(row["task_id"])].append(row)
+    task_ids = sorted(task_runs_by_id.keys())
     rows: list[dict[str, Any]] = []
     for task_id in task_ids:
         condition_map: dict[str, dict[str, Any]] = {}
@@ -280,6 +317,7 @@ def build_task_rows(
         nia = condition_map["nia_agent"]["completed_only_avg_quality_pct"]
         crash_no = condition_map["no_retrieval_agent"]["crash_aware_avg_quality_pct"]
         crash_nia = condition_map["nia_agent"]["crash_aware_avg_quality_pct"]
+        pairwise = compute_pairwise_outcomes(task_runs_by_id.get(task_id, []))
 
         rows.append(
             {
@@ -289,6 +327,10 @@ def build_task_rows(
                 "by_condition": condition_map,
                 "delta_completed_only_pct": delta(nia, no_retrieval),
                 "delta_crash_aware_pct": delta(crash_nia, crash_no),
+                "pairwise_comparisons": pairwise["comparisons"],
+                "pairwise_nia_wins": pairwise["nia_wins"],
+                "pairwise_ties": pairwise["ties"],
+                "pairwise_no_retrieval_wins": pairwise["no_retrieval_wins"],
             }
         )
     return rows
@@ -350,12 +392,26 @@ def build_library_rows(task_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     by_condition["nia_agent"]["crash_aware_avg_quality_pct"],
                     by_condition["no_retrieval_agent"]["crash_aware_avg_quality_pct"],
                 ),
+                "pairwise_comparisons": sum(
+                    int(task_row.get("pairwise_comparisons", 0)) for task_row in task_rows_for_library
+                ),
+                "pairwise_nia_wins": sum(
+                    int(task_row.get("pairwise_nia_wins", 0)) for task_row in task_rows_for_library
+                ),
+                "pairwise_ties": sum(int(task_row.get("pairwise_ties", 0)) for task_row in task_rows_for_library),
+                "pairwise_no_retrieval_wins": sum(
+                    int(task_row.get("pairwise_no_retrieval_wins", 0)) for task_row in task_rows_for_library
+                ),
             }
         )
     return rows
 
 
-def build_summary(run_rows: list[dict[str, Any]], condition_rows: list[dict[str, Any]]) -> dict[str, Any]:
+def build_summary(
+    run_rows: list[dict[str, Any]],
+    condition_rows: list[dict[str, Any]],
+    task_rows: list[dict[str, Any]],
+) -> dict[str, Any]:
     condition_map = {row["condition"]: row for row in condition_rows}
     no_row = condition_map.get("no_retrieval_agent", {})
     nia_row = condition_map.get("nia_agent", {})
@@ -374,6 +430,20 @@ def build_summary(run_rows: list[dict[str, Any]], condition_rows: list[dict[str,
         model_provider, model, judge_provider, judge_model = next(iter(model_pairs))
     else:
         model_provider = model = judge_provider = judge_model = None
+
+    comparable_task_deltas = [
+        row.get("delta_completed_only_pct")
+        for row in task_rows
+        if isinstance(row.get("delta_completed_only_pct"), (int, float))
+    ]
+    task_delta_ties = sum(1 for value in comparable_task_deltas if is_close_to_zero(float(value)))
+    task_delta_nia_positive = sum(1 for value in comparable_task_deltas if float(value) > 0.0)
+    task_delta_no_retrieval_positive = sum(1 for value in comparable_task_deltas if float(value) < 0.0)
+
+    pairwise_comparisons = sum(int(row.get("pairwise_comparisons", 0)) for row in task_rows)
+    pairwise_nia_wins = sum(int(row.get("pairwise_nia_wins", 0)) for row in task_rows)
+    pairwise_ties = sum(int(row.get("pairwise_ties", 0)) for row in task_rows)
+    pairwise_no_retrieval_wins = sum(int(row.get("pairwise_no_retrieval_wins", 0)) for row in task_rows)
 
     return {
         "delta_completed_only_pct": delta(
@@ -406,6 +476,14 @@ def build_summary(run_rows: list[dict[str, Any]], condition_rows: list[dict[str,
         },
         "nia_usage_rate": nia_row.get("nia_usage_rate"),
         "avg_nia_calls_per_nia_run": nia_row.get("avg_nia_calls_per_nia_run"),
+        "task_delta_ties": task_delta_ties,
+        "task_delta_nia_positive": task_delta_nia_positive,
+        "task_delta_no_retrieval_positive": task_delta_no_retrieval_positive,
+        "pairwise_comparisons": pairwise_comparisons,
+        "pairwise_nia_wins": pairwise_nia_wins,
+        "pairwise_ties": pairwise_ties,
+        "pairwise_no_retrieval_wins": pairwise_no_retrieval_wins,
+        "pairwise_tie_rate": rate_or_null(pairwise_ties, pairwise_comparisons),
         "unique_tasks": len({str(row["task_id"]) for row in run_rows}),
         "total_runs": len(run_rows),
         "model_provider": model_provider,
@@ -443,10 +521,57 @@ def rate(numerator: int, denominator: int) -> float:
     return round((numerator / denominator) * 100.0, 6)
 
 
+def rate_or_null(numerator: int, denominator: int) -> float | None:
+    if denominator <= 0:
+        return None
+    return round((numerator / denominator) * 100.0, 6)
+
+
 def stddev(values: list[float]) -> float | None:
     if len(values) < 2:
         return None
     return round(float(statistics.pstdev(values)), 6)
+
+
+def compute_pairwise_outcomes(task_rows: list[dict[str, Any]]) -> dict[str, int]:
+    scores_by_condition_rep: dict[str, dict[int, list[float]]] = {
+        "no_retrieval_agent": defaultdict(list),
+        "nia_agent": defaultdict(list),
+    }
+    for row in task_rows:
+        condition = str(row.get("condition"))
+        repetition_index = row.get("repetition_index")
+        quality_score = row.get("quality_score_pct")
+        if condition not in scores_by_condition_rep:
+            continue
+        if not isinstance(repetition_index, int) or not isinstance(quality_score, (int, float)):
+            continue
+        scores_by_condition_rep[condition][repetition_index].append(float(quality_score))
+
+    no_retrieval_reps = set(scores_by_condition_rep["no_retrieval_agent"].keys())
+    nia_reps = set(scores_by_condition_rep["nia_agent"].keys())
+    shared_reps = sorted(no_retrieval_reps & nia_reps)
+
+    outcomes = {"comparisons": 0, "nia_wins": 0, "ties": 0, "no_retrieval_wins": 0}
+    for rep in shared_reps:
+        no_scores = scores_by_condition_rep["no_retrieval_agent"][rep]
+        nia_scores = scores_by_condition_rep["nia_agent"][rep]
+        if not no_scores or not nia_scores:
+            continue
+        no_value = sum(no_scores) / len(no_scores)
+        nia_value = sum(nia_scores) / len(nia_scores)
+        outcomes["comparisons"] += 1
+        if nia_value > no_value:
+            outcomes["nia_wins"] += 1
+        elif nia_value < no_value:
+            outcomes["no_retrieval_wins"] += 1
+        else:
+            outcomes["ties"] += 1
+    return outcomes
+
+
+def is_close_to_zero(value: float, epsilon: float = 1e-9) -> bool:
+    return -epsilon <= value <= epsilon
 
 
 if __name__ == "__main__":
