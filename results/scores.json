@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-02T04:05:34.400934+00:00",
+  "generated_at": "2026-04-03T19:06:18.317713+00:00",
   "summary": {
     "overall_without_nia": 75.0,
     "overall_with_nia": 85.833333,
@@ -25,7 +25,7 @@
     {
       "id": "anthropic-sdk",
       "label": "Anthropic SDK",
-      "tasks": 4,
+      "tasks": 2,
       "without_nia": 62.5,
       "with_nia": 100.0,
       "delta_pct": 37.5,
@@ -34,7 +34,7 @@
     {
       "id": "authjs",
       "label": "NextAuth / Auth.js",
-      "tasks": 4,
+      "tasks": 2,
       "without_nia": 87.5,
       "with_nia": 87.5,
       "delta_pct": 0.0,
@@ -43,7 +43,7 @@
     {
       "id": "drizzle-orm",
       "label": "Drizzle ORM",
-      "tasks": 4,
+      "tasks": 2,
       "without_nia": 87.5,
       "with_nia": 87.5,
       "delta_pct": 0.0,
@@ -52,7 +52,7 @@
     {
       "id": "effect-ts",
       "label": "Effect-TS",
-      "tasks": 2,
+      "tasks": 1,
       "without_nia": 100.0,
       "with_nia": 25.0,
       "delta_pct": -75.0,
@@ -61,7 +61,7 @@
     {
       "id": "huggingface-diffusers",
       "label": "HuggingFace Diffusers",
-      "tasks": 2,
+      "tasks": 1,
       "without_nia": 100.0,
       "with_nia": 100.0,
       "delta_pct": 0.0,
@@ -70,7 +70,7 @@
     {
       "id": "huggingface-transformers",
       "label": "HuggingFace Transformers",
-      "tasks": 4,
+      "tasks": 2,
       "without_nia": 75.0,
       "with_nia": 75.0,
       "delta_pct": 0.0,
@@ -79,7 +79,7 @@
     {
       "id": "langchain-js",
       "label": "LangChain JS",
-      "tasks": 4,
+      "tasks": 2,
       "without_nia": 75.0,
       "with_nia": 100.0,
       "delta_pct": 25.0,
@@ -88,7 +88,7 @@
     {
       "id": "langchain-python",
       "label": "LangChain Python",
-      "tasks": 4,
+      "tasks": 2,
       "without_nia": 87.5,
       "with_nia": 87.5,
       "delta_pct": 0.0,
@@ -97,7 +97,7 @@
     {
       "id": "llamaindex",
       "label": "LlamaIndex",
-      "tasks": 4,
+      "tasks": 2,
       "without_nia": 75.0,
       "with_nia": 50.0,
       "delta_pct": -25.0,
@@ -106,7 +106,7 @@
     {
       "id": "openai-sdk",
       "label": "OpenAI SDK",
-      "tasks": 2,
+      "tasks": 1,
       "without_nia": 25.0,
       "with_nia": 100.0,
       "delta_pct": 75.0,
@@ -115,7 +115,7 @@
     {
       "id": "prisma",
       "label": "Prisma",
-      "tasks": 4,
+      "tasks": 2,
       "without_nia": 100.0,
       "with_nia": 100.0,
       "delta_pct": 0.0,
@@ -124,7 +124,7 @@
     {
       "id": "radix-ui",
       "label": "Radix UI",
-      "tasks": 2,
+      "tasks": 1,
       "without_nia": 25.0,
       "with_nia": 100.0,
       "delta_pct": 75.0,
@@ -133,7 +133,7 @@
     {
       "id": "shadcn-ui",
       "label": "shadcn/ui",
-      "tasks": 2,
+      "tasks": 1,
       "without_nia": 50.0,
       "with_nia": 50.0,
       "delta_pct": 0.0,
@@ -142,7 +142,7 @@
     {
       "id": "supabase-js",
       "label": "Supabase JS",
-      "tasks": 2,
+      "tasks": 1,
       "without_nia": 100.0,
       "with_nia": 100.0,
       "delta_pct": 0.0,
@@ -151,7 +151,7 @@
     {
       "id": "tanstack-query",
       "label": "TanStack Query",
-      "tasks": 2,
+      "tasks": 1,
       "without_nia": 100.0,
       "with_nia": 100.0,
       "delta_pct": 0.0,
@@ -160,7 +160,7 @@
     {
       "id": "tanstack-router",
       "label": "TanStack Router",
-      "tasks": 2,
+      "tasks": 1,
       "without_nia": 25.0,
       "with_nia": 100.0,
       "delta_pct": 75.0,
@@ -169,7 +169,7 @@
     {
       "id": "trpc",
       "label": "tRPC",
-      "tasks": 4,
+      "tasks": 2,
       "without_nia": 87.5,
       "with_nia": 87.5,
       "delta_pct": 0.0,
@@ -178,7 +178,7 @@
     {
       "id": "upstash-redis-sdk",
       "label": "Upstash Redis SDK",
-      "tasks": 2,
+      "tasks": 1,
       "without_nia": 50.0,
       "with_nia": 100.0,
       "delta_pct": 50.0,
@@ -187,7 +187,7 @@
     {
       "id": "vercel-ai-sdk",
       "label": "Vercel AI SDK",
-      "tasks": 4,
+      "tasks": 2,
       "without_nia": 50.0,
       "with_nia": 75.0,
       "delta_pct": 25.0,
@@ -196,7 +196,7 @@
     {
       "id": "zod",
       "label": "Zod",
-      "tasks": 2,
+      "tasks": 1,
       "without_nia": 100.0,
       "with_nia": 100.0,
       "delta_pct": 0.0,

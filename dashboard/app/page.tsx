@@ -30,10 +30,18 @@ export default function HomePage() {
   const evaluationsCount = summary.evaluations_count;
   const uniqueTasks = summary.unique_tasks;
   const modelCount = summary.models_tested.length;
+  const perfectSharePct =
+    evaluationsCount > 0
+      ? (summary.perfect_baseline_count / evaluationsCount) * 100
+      : null;
+  const nonperfectSharePct =
+    evaluationsCount > 0
+      ? (summary.nonperfect_baseline_count / evaluationsCount) * 100
+      : null;
 
   return (
     <>
-      <section className="hero">
+      <section className="hero animate-in">
         <div>
           <p className="eyebrow">Benchmark for context retrieval</p>
           <h1>NiaBench</h1>
@@ -55,18 +63,21 @@ export default function HomePage() {
         </div>
 
         <div className="stats">
-          <article className="stat-card">
-            <p>Overall delta</p>
-            <strong>{formatSignedPercent(summary.improvement_delta_pct)}</strong>
+          <article className="stat-card animate-in delay-1">
+            <p>Segment composition</p>
+            <strong className="metric-col">
+              {summary.perfect_baseline_count} / {summary.nonperfect_baseline_count}
+            </strong>
             <p>
-              {formatPercent(summary.overall_without_nia)} &rarr;{" "}
-              {formatPercent(summary.overall_with_nia)}
+              Perfect / non-perfect evaluations
             </p>
-            <p>All {evaluationsCount} evaluations</p>
+            <p>
+              {formatPercent(perfectSharePct)} / {formatPercent(nonperfectSharePct)}
+            </p>
           </article>
-          <article className="stat-card">
+          <article className="stat-card animate-in delay-1" style={{ animationDelay: '0.15s' }}>
             <p>Perfect baseline delta</p>
-            <strong className={deltaClass(summary.perfect_baseline_delta_pct)}>
+            <strong className={`metric-col ${deltaClass(summary.perfect_baseline_delta_pct)}`}>
               {formatSignedPercent(summary.perfect_baseline_delta_pct)}
             </strong>
             <p>
@@ -77,9 +88,9 @@ export default function HomePage() {
               {summary.perfect_baseline_count} of {evaluationsCount} evaluations
             </p>
           </article>
-          <article className="stat-card">
+          <article className="stat-card animate-in delay-1" style={{ animationDelay: '0.2s' }}>
             <p>Evaluations / Libraries</p>
-            <strong>
+            <strong className="metric-col">
               {evaluationsCount} / {summary.libraries_covered}
             </strong>
             <p>
@@ -88,10 +99,10 @@ export default function HomePage() {
           </article>
         </div>
 
-        <div className="callout">
-          The overall delta ({formatSignedPercent(summary.improvement_delta_pct)}) blends two
-          evaluation populations. In {summary.nonperfect_baseline_count} evaluations where the
-          baseline scored below the rubric maximum, context improved scores by{" "}
+        <div className="callout animate-in delay-2">
+          Segment deltas should be interpreted separately. In{" "}
+          {summary.nonperfect_baseline_count} evaluations where the baseline scored below the
+          rubric maximum, context improved scores by{" "}
           <span className={deltaClass(summary.nonperfect_baseline_delta_pct)}>
             {formatSignedPercent(summary.nonperfect_baseline_delta_pct)}
           </span>
@@ -102,20 +113,25 @@ export default function HomePage() {
           </span>
           . This is a descriptive split on observed baseline score. Because {uniqueTasks} tasks
           are evaluated across {modelCount} models ({evaluationsCount} evaluations total), the
-          same task can appear in different segments depending on the model.
+          same task can appear in different segments depending on the model. For completeness, the
+          blended overall delta across all evaluations is{" "}
+          <span className={deltaClass(summary.improvement_delta_pct)}>
+            {formatSignedPercent(summary.improvement_delta_pct)}
+          </span>
+          .
         </div>
       </section>
 
       <section className="panel-grid">
-        <article className="panel">
+        <article className="panel animate-in delay-2">
           <h2>Library leaderboard</h2>
           <table className="leaderboard">
             <thead>
               <tr>
                 <th>Library</th>
                 <th>Tasks</th>
-                <th>Without</th>
-                <th>With</th>
+                <th>Without Context</th>
+                <th>With Context</th>
                 <th>Delta</th>
               </tr>
             </thead>
@@ -129,18 +145,35 @@ export default function HomePage() {
                   <tr key={library.id}>
                     <td>{library.label}</td>
                     <td>{library.tasks}</td>
-                    <td>{formatPercent(library.without_nia)}</td>
-                    <td>{formatPercent(library.with_nia)}</td>
+                    
+                    <td className="metric-col">
+                      <div className="score-cell">
+                        <span style={{ width: '45px', display: 'inline-block' }}>{formatPercent(library.without_nia)}</span>
+                        <div className="score-bar-bg">
+                           <div className="score-bar-fill" style={{ width: library.without_nia ? `${library.without_nia}%` : '0%', background: 'var(--muted)' }} />
+                        </div>
+                      </div>
+                    </td>
+                    
+                    <td className="metric-col">
+                      <div className="score-cell">
+                        <span style={{ width: '45px', display: 'inline-block' }}>{formatPercent(library.with_nia)}</span>
+                        <div className="score-bar-bg">
+                           <div className="score-bar-fill" style={{ width: library.with_nia ? `${library.with_nia}%` : '0%' }} />
+                        </div>
+                      </div>
+                    </td>
+
                     <td
-                      className={
+                      className={`metric-col ${
                         library.delta_pct === null
                           ? ""
                           : library.delta_pct >= 0
                             ? "delta-positive"
                             : "delta-negative"
-                      }
+                      }`}
                     >
-                      {formatPercent(library.delta_pct)}
+                      {formatSignedPercent(library.delta_pct)}
                     </td>
                   </tr>
                 ))
@@ -149,7 +182,7 @@ export default function HomePage() {
           </table>
         </article>
 
-        <article className="panel">
+        <article className="panel animate-in delay-2" style={{ animationDelay: '0.3s' }}>
           <h2>Method</h2>
           <p>
             Each task is run twice with identical model parameters: once without external
@@ -160,7 +193,7 @@ export default function HomePage() {
             Raw prompts, retrieved context, and model outputs are all written to disk so the
             evaluation is auditable rather than purely anecdotal.
           </p>
-          <div className="callout">
+          <div className="callout" style={{ marginTop: '24px' }}>
             Current status: this dashboard renders committed pilot scores from
             <code> results/scores.json</code> (generated from
             <code> results/raw_curated/combined</code>). Scoring for this sprint is judge-only

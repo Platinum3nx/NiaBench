@@ -1,7 +1,11 @@
+import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const robotoMono = Roboto_Mono({ subsets: ["latin"], variable: "--font-roboto-mono" });
 
 export const metadata: Metadata = {
   title: "NiaBench",
@@ -10,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${robotoMono.variable}`}>
       <body>
         <main>
           <nav className="nav">

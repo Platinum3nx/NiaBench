@@ -169,6 +169,11 @@ def build_scores_file(*, task_rows: list[dict[str, Any]], library_labels: dict[s
     library_rows: list[dict[str, Any]] = []
     for library_id in sorted(by_library):
         rows = by_library[library_id]
+        unique_library_tasks = {
+            row.get("task_id")
+            for row in rows
+            if isinstance(row.get("task_id"), str) and row.get("task_id")
+        }
         valid = [
             row
             for row in rows
@@ -187,7 +192,8 @@ def build_scores_file(*, task_rows: list[dict[str, Any]], library_labels: dict[s
             {
                 "id": library_id,
                 "label": library_labels.get(library_id, library_id),
-                "tasks": len(rows),
+                # "tasks" represents unique task ids in this library.
+                "tasks": len(unique_library_tasks),
                 "without_nia": without,
                 "with_nia": with_nia,
                 "delta_pct": delta,
