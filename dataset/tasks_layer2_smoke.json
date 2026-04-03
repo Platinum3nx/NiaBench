@@ -1,0 +1,91 @@
+[
+  {
+    "id": "anthropic-sdk-completions-to-messages",
+    "source_task_id": "anthropic-sdk-completions-to-messages",
+    "library": "anthropic-sdk",
+    "version_introduced": "2023-06",
+    "category": "api-migration",
+    "difficulty": "easy",
+    "agent_goal": "Update the seeded TypeScript request file so it uses the current Anthropic messages API shape instead of the deprecated completions endpoint.",
+    "workspace_seed": {
+      "seed_dir": "dataset/agent_seeds/anthropic-sdk-completions-to-messages"
+    },
+    "expected_artifacts": [
+      {
+        "path": "src/request.ts",
+        "kind": "code_file",
+        "required": true
+      }
+    ],
+    "allowed_output_paths": [
+      "src/request.ts"
+    ],
+    "retrieval_hints": [
+      "Anthropic JavaScript SDK messages endpoint",
+      "messages.create role content array"
+    ],
+    "success_notes": "A valid solution should remove completions.create and move prompt text into a user role message."
+  },
+  {
+    "id": "authjs-nextauth-import-root",
+    "source_task_id": "authjs-nextauth-import-root",
+    "library": "authjs",
+    "version_introduced": "v5",
+    "category": "import-path",
+    "difficulty": "easy",
+    "agent_goal": "Fix the seeded Auth.js config to use the modern root import path and keep the initialization export shape valid for Auth.js v5.",
+    "workspace_seed": {
+      "seed_dir": "dataset/agent_seeds/authjs-nextauth-import-root"
+    },
+    "expected_artifacts": [
+      {
+        "path": "auth.ts",
+        "kind": "code_file",
+        "required": true
+      }
+    ],
+    "allowed_output_paths": [
+      "auth.ts"
+    ],
+    "retrieval_hints": [
+      "Auth.js v5 NextAuth root import",
+      "NextAuth handlers auth export object"
+    ],
+    "success_notes": "A valid fix updates the import from next-auth/next to next-auth."
+  },
+  {
+    "id": "prisma-remove-client-extensions-preview-flag",
+    "source_task_id": "prisma-remove-client-extensions-preview-flag",
+    "library": "prisma",
+    "version_introduced": "v5",
+    "category": "config-schema",
+    "difficulty": "medium",
+    "agent_goal": "Clean the seeded Prisma schema to remove obsolete preview flag usage while preserving a valid generator and datasource block.",
+    "workspace_seed": {
+      "seed_dir": "dataset/agent_seeds/prisma-remove-client-extensions-preview-flag"
+    },
+    "expected_artifacts": [
+      {
+        "path": "schema.prisma",
+        "kind": "config_file",
+        "required": true
+      }
+    ],
+    "allowed_output_paths": [
+      "schema.prisma"
+    ],
+    "retrieval_hints": [
+      "Prisma v5 generator preview features availability",
+      "clientExtensions general availability"
+    ],
+    "test_command": {
+      "argv": [
+        "python3",
+        "scripts/check_schema.py"
+      ],
+      "cwd": ".",
+      "timeout_seconds": 20
+    },
+    "success_notes": "The task command passes when schema.prisma does not contain previewFeatures."
+  }
+]

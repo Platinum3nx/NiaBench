@@ -23,6 +23,9 @@ jobs:
       - name: Validate smoke fixture
         run: python3 scripts/validate_tasks.py dataset/tasks_smoke.json
 
+      - name: Check Layer 2 boundaries
+        run: python3 scripts/check_layer2_boundaries.py
+
       - name: Compile core Python modules
         run: python3 -m compileall harness grading scripts
 
