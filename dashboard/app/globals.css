@@ -155,10 +155,6 @@ main {
   color: var(--negative);
 }
 
-.delta-muted {
-  color: var(--muted);
-}
-
 .nav {
   display: flex;
   gap: 16px;

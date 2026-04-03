@@ -8,26 +8,9 @@ function formatPercent(value: number | null): string {
   return `${value.toFixed(1)}%`;
 }
 
-function formatCompletedOnlyPercent(value: number | null): string {
-  if (value === null) {
-    return "No completed runs";
-  }
-  return `${value.toFixed(1)}%`;
-}
-
 function formatSignedPercent(value: number | null): string {
   if (value === null) {
     return "Pending";
-  }
-  if (value > 0) {
-    return `+${value.toFixed(1)}%`;
-  }
-  return `${value.toFixed(1)}%`;
-}
-
-function formatCompletedOnlyDelta(value: number | null): string {
-  if (value === null) {
-    return "Needs completed runs";
   }
   if (value > 0) {
     return `+${value.toFixed(1)}%`;
@@ -40,13 +23,6 @@ function deltaClass(value: number | null): string {
     return "";
   }
   return value >= 0 ? "delta-positive" : "delta-negative";
-}
-
-function completedOnlyDeltaClass(value: number | null): string {
-  if (value === null) {
-    return "delta-muted";
-  }
-  return deltaClass(value);
 }
 
 function conditionLabel(condition: string): string {
@@ -145,7 +121,7 @@ export default function AgentPage() {
                 <tr key={row.condition}>
                   <td>{conditionLabel(row.condition)}</td>
                   <td>{row.total_runs}</td>
-                  <td>{formatCompletedOnlyPercent(row.task_macro_completed_only_avg_quality_pct)}</td>
+                  <td>{formatPercent(row.task_macro_completed_only_avg_quality_pct)}</td>
                   <td>{formatPercent(row.task_macro_crash_aware_avg_quality_pct)}</td>
                   <td>{formatPercent(row.run_level_completion_rate)}</td>
                   <td>{formatPercent(row.run_level_crash_rate)}</td>
@@ -189,7 +165,6 @@ export default function AgentPage() {
       <section className="panel-grid">
         <article className="panel">
           <h2>Library summary</h2>
-          <p>Completed-only fields require at least one successful run for the row and condition.</p>
           <table className="leaderboard">
             <thead>
               <tr>
@@ -206,17 +181,13 @@ export default function AgentPage() {
                   <td>{library.library}</td>
                   <td>{library.tasks}</td>
                   <td>
-                    {formatCompletedOnlyPercent(
+                    {formatPercent(
                       library.by_condition.no_retrieval_agent.completed_only_avg_quality_pct,
                     )}
                   </td>
-                  <td>
-                    {formatCompletedOnlyPercent(
-                      library.by_condition.nia_agent.completed_only_avg_quality_pct,
-                    )}
-                  </td>
-                  <td className={completedOnlyDeltaClass(library.delta_completed_only_pct)}>
-                    {formatCompletedOnlyDelta(library.delta_completed_only_pct)}
+                  <td>{formatPercent(library.by_condition.nia_agent.completed_only_avg_quality_pct)}</td>
+                  <td className={deltaClass(library.delta_completed_only_pct)}>
+                    {formatSignedPercent(library.delta_completed_only_pct)}
                   </td>
                 </tr>
               ))}
@@ -226,7 +197,6 @@ export default function AgentPage() {
 
         <article className="panel">
           <h2>Task summary</h2>
-          <p>Rows without successful runs still count in crash-aware metrics above.</p>
           <table className="leaderboard">
             <thead>
               <tr>
@@ -242,16 +212,10 @@ export default function AgentPage() {
                 <tr key={task.task_id}>
                   <td>{task.task_id}</td>
                   <td>{task.difficulty}</td>
-                  <td>
-                    {formatCompletedOnlyPercent(
-                      task.by_condition.no_retrieval_agent.completed_only_avg_quality_pct,
-                    )}
-                  </td>
-                  <td>
-                    {formatCompletedOnlyPercent(task.by_condition.nia_agent.completed_only_avg_quality_pct)}
-                  </td>
-                  <td className={completedOnlyDeltaClass(task.delta_completed_only_pct)}>
-                    {formatCompletedOnlyDelta(task.delta_completed_only_pct)}
+                  <td>{formatPercent(task.by_condition.no_retrieval_agent.completed_only_avg_quality_pct)}</td>
+                  <td>{formatPercent(task.by_condition.nia_agent.completed_only_avg_quality_pct)}</td>
+                  <td className={deltaClass(task.delta_completed_only_pct)}>
+                    {formatSignedPercent(task.delta_completed_only_pct)}
                   </td>
                 </tr>
               ))}
