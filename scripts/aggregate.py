@@ -18,7 +18,7 @@ def parse_args() -> argparse.Namespace:
         default="results/raw_curated/combined",
         help=(
             "Directory containing raw task artifacts. "
-            "Use results/raw_curated/combined for founder-facing aggregates."
+            "Use results/raw_curated/combined for published release aggregates."
         ),
     )
     parser.add_argument("--output", default="results/scores.json", help="Aggregate score output path")

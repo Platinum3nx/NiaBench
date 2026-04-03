@@ -54,7 +54,7 @@ The first version should cover a focused set of high-churn libraries and enough 
 
 ## Dataset Requirements
 
-The dataset lives in [`dataset/tasks.json`](/Users/arjunmalghan/NiaBench/dataset/tasks.json) and is validated against [`dataset/task.schema.json`](/Users/arjunmalghan/NiaBench/dataset/task.schema.json).
+The dataset lives in [`dataset/tasks.json`](dataset/tasks.json) and is validated against [`dataset/task.schema.json`](dataset/task.schema.json).
 
 Each task should include:
 
@@ -102,7 +102,7 @@ The initial set can stay focused. A smaller list of good libraries with clear ta
 
 ## Evaluation Harness
 
-The evaluation harness lives in [`harness/run_eval.py`](/Users/arjunmalghan/NiaBench/harness/run_eval.py) with supporting code in the rest of the [`harness`](/Users/arjunmalghan/NiaBench/harness) package.
+The evaluation harness lives in [`harness/run_eval.py`](harness/run_eval.py) with supporting code in the rest of the [`harness`](harness) package.
 
 For each task, the harness should:
 
@@ -123,7 +123,7 @@ Required harness behavior:
 
 ## Grading
 
-The grading pipeline lives in [`grading`](/Users/arjunmalghan/NiaBench/grading).
+The grading pipeline lives in [`grading`](grading).
 
 The project uses two grading signals:
 
@@ -155,7 +155,7 @@ These details make the results easier to interpret and help show whether fresh d
 
 ## Results Format
 
-Each run should produce structured results under [`results`](/Users/arjunmalghan/NiaBench/results).
+Each run should produce structured results under [`results`](results).
 
 At minimum, result artifacts should include:
 
@@ -176,7 +176,7 @@ Aggregate output should make it easy to answer a few basic questions:
 
 ## Dashboard
 
-The dashboard lives in [`dashboard`](/Users/arjunmalghan/NiaBench/dashboard) and should stay lightweight.
+The dashboard lives in [`dashboard`](dashboard) and should stay lightweight.
 
 It does not need to be a full application. A simple static site is enough as long as it can show:
 
@@ -191,7 +191,7 @@ The goal is readability, not polish for its own sake.
 
 ## Validation and Maintenance
 
-Task validation and automation live in [`scripts`](/Users/arjunmalghan/NiaBench/scripts) and [`.github/workflows`](/Users/arjunmalghan/NiaBench/.github/workflows).
+Task validation and automation live in [`scripts`](scripts) and [`.github/workflows`](.github/workflows).
 
 The project should include:
 
@@ -217,13 +217,13 @@ The benchmark does not need to be huge to be useful. A smaller benchmark with cl
 
 ## Repo Map
 
-- [`dataset`](/Users/arjunmalghan/NiaBench/dataset): tasks, rubrics, schema, and library metadata
-- [`harness`](/Users/arjunmalghan/NiaBench/harness): evaluation flow, prompts, provider clients, and Nia integration
-- [`grading`](/Users/arjunmalghan/NiaBench/grading): sandbox, judge, and composite scoring
-- [`results`](/Users/arjunmalghan/NiaBench/results): raw outputs, caches, and aggregate score files
-- [`dashboard`](/Users/arjunmalghan/NiaBench/dashboard): static results UI
-- [`scripts`](/Users/arjunmalghan/NiaBench/scripts): validation and update utilities
-- [`docs/METHODOLOGY.md`](/Users/arjunmalghan/NiaBench/docs/METHODOLOGY.md): benchmark framing and grading notes
+- [`dataset`](dataset): tasks, rubrics, schema, and library metadata
+- [`harness`](harness): evaluation flow, prompts, provider clients, and Nia integration
+- [`grading`](grading): sandbox, judge, and composite scoring
+- [`results`](results): raw outputs, caches, and aggregate score files
+- [`dashboard`](dashboard): static results UI
+- [`scripts`](scripts): validation and update utilities
+- [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md): benchmark framing and grading notes
 
 ## Nice-to-Haves
 

@@ -5,7 +5,7 @@ Next.js dashboard for the current NiaBench launch artifact set.
 ## Data Source
 
 - Reads committed benchmark aggregate from `results/scores.json`
-- Founder-facing aggregate must be regenerated from `results/raw_curated/combined`
+- Published release aggregate should be regenerated from `results/raw_curated/combined`
 
 ## Local Build
 
