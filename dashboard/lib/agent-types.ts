@@ -12,14 +12,6 @@ export type AgentSummary = {
   run_level_judge_error_rate: AgentRateMap;
   nia_usage_rate: number | null;
   avg_nia_calls_per_nia_run: number | null;
-  task_delta_ties: number;
-  task_delta_nia_positive: number;
-  task_delta_no_retrieval_positive: number;
-  pairwise_comparisons: number;
-  pairwise_nia_wins: number;
-  pairwise_ties: number;
-  pairwise_no_retrieval_wins: number;
-  pairwise_tie_rate: number | null;
   unique_tasks: number;
   total_runs: number;
   model_provider: string | null;
@@ -40,13 +32,8 @@ export type AgentConditionRow = {
   run_level_timeout_rate: number | null;
   run_level_no_artifact_rate: number | null;
   run_level_judge_error_rate: number | null;
-  run_level_retrieval_error_rate: number | null;
-  run_level_workspace_tool_error_rate: number | null;
-  run_level_nia_tool_error_rate: number | null;
   avg_tool_calls_per_run: number | null;
-  avg_tool_error_calls_per_run: number | null;
   avg_nia_calls_per_run: number | null;
-  avg_nia_tool_error_calls_per_run: number | null;
   nia_usage_rate: number | null;
   avg_nia_calls_per_nia_run: number | null;
 };
@@ -68,10 +55,6 @@ export type AgentTaskRow = {
   by_condition: Record<AgentConditionId, AgentTaskConditionStats>;
   delta_completed_only_pct: number | null;
   delta_crash_aware_pct: number | null;
-  pairwise_comparisons: number;
-  pairwise_nia_wins: number;
-  pairwise_ties: number;
-  pairwise_no_retrieval_wins: number;
 };
 
 export type AgentLibraryConditionStats = {
@@ -86,10 +69,6 @@ export type AgentLibraryRow = {
   by_condition: Record<AgentConditionId, AgentLibraryConditionStats>;
   delta_completed_only_pct: number | null;
   delta_crash_aware_pct: number | null;
-  pairwise_comparisons: number;
-  pairwise_nia_wins: number;
-  pairwise_ties: number;
-  pairwise_no_retrieval_wins: number;
 };
 
 export type AgentScoresFile = {

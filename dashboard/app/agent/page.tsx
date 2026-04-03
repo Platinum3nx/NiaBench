@@ -1,25 +1,11 @@
 import { loadAgentScores } from "@/lib/load-agent-scores";
 import type { AgentScoresFile } from "@/lib/agent-types";
 
-function formatPercent(value: number | null | undefined): string {
-  if (value === null || value === undefined) {
+function formatPercent(value: number | null): string {
+  if (value === null) {
     return "Pending";
   }
   return `${value.toFixed(1)}%`;
-}
-
-function formatCount(value: number | null | undefined): string {
-  if (value === null || value === undefined) {
-    return "Pending";
-  }
-  return value.toFixed(1);
-}
-
-function formatInt(value: number | null | undefined): string {
-  if (value === null || value === undefined) {
-    return "Pending";
-  }
-  return value.toString();
 }
 
 function formatCompletedOnlyPercent(value: number | null): string {
@@ -88,24 +74,6 @@ function conditionLabel(condition: string): string {
   return condition;
 }
 
-function formatPairwiseOutcome(
-  niaWins: number | null | undefined,
-  ties: number | null | undefined,
-  noRetrievalWins: number | null | undefined,
-): string {
-  if (
-    niaWins === null ||
-    niaWins === undefined ||
-    ties === null ||
-    ties === undefined ||
-    noRetrievalWins === null ||
-    noRetrievalWins === undefined
-  ) {
-    return "Pending";
-  }
-  return `${niaWins} / ${ties} / ${noRetrievalWins}`;
-}
-
 export default function AgentPage() {
   const scores = safeLoadAgentScores();
   if (scores === null) {
@@ -150,8 +118,7 @@ export default function AgentPage() {
         <p className="hero-copy">
           Layer 2 asks a separate question from Layer 1: does the same coding agent perform
           better with a structured Nia retrieval tool than with no external retrieval tool?
-          Metrics stay isolated from the Layer 1 benchmark, and pairwise outcomes help disambiguate
-          score ties from data gaps.
+          Metrics stay isolated from the Layer 1 benchmark.
         </p>
         <div className="stats">
           <article className="stat-card">
@@ -175,26 +142,7 @@ export default function AgentPage() {
           <article className="stat-card">
             <p>Nia usage rate</p>
             <strong>{formatPercent(summary.nia_usage_rate)}</strong>
-            <p>Avg Nia calls in Nia runs: {formatCount(summary.avg_nia_calls_per_nia_run)}</p>
-          </article>
-          <article className="stat-card">
-            <p>Pairwise outcomes (W/T/L)</p>
-            <strong>
-              {formatPairwiseOutcome(
-                summary.pairwise_nia_wins,
-                summary.pairwise_ties,
-                summary.pairwise_no_retrieval_wins,
-              )}
-            </strong>
-            <p>Tie rate: {formatPercent(summary.pairwise_tie_rate)}</p>
-          </article>
-          <article className="stat-card">
-            <p>Task deltas (Nia/Tie/Base)</p>
-            <strong>
-              {formatInt(summary.task_delta_nia_positive)} / {formatInt(summary.task_delta_ties)} /{" "}
-              {formatInt(summary.task_delta_no_retrieval_positive)}
-            </strong>
-            <p>Across {summary.unique_tasks} tasks</p>
+            <p>Avg Nia calls in Nia runs: {formatPercent(summary.avg_nia_calls_per_nia_run)}</p>
           </article>
         </div>
         <div className="callout">
@@ -247,11 +195,7 @@ export default function AgentPage() {
                 <th>Timeout</th>
                 <th>No artifact</th>
                 <th>Judge error</th>
-                <th>Retrieval error</th>
-                <th>Workspace tool error</th>
-                <th>Nia tool error runs</th>
                 <th>Avg tool calls</th>
-                <th>Avg tool errors</th>
               </tr>
             </thead>
             <tbody>
@@ -261,11 +205,7 @@ export default function AgentPage() {
                   <td>{formatPercent(row.run_level_timeout_rate)}</td>
                   <td>{formatPercent(row.run_level_no_artifact_rate)}</td>
                   <td>{formatPercent(row.run_level_judge_error_rate)}</td>
-                  <td>{formatPercent(row.run_level_retrieval_error_rate)}</td>
-                  <td>{formatPercent(row.run_level_workspace_tool_error_rate)}</td>
-                  <td>{formatPercent(row.run_level_nia_tool_error_rate)}</td>
-                  <td>{formatCount(row.avg_tool_calls_per_run)}</td>
-                  <td>{formatCount(row.avg_tool_error_calls_per_run)}</td>
+                  <td>{formatPercent(row.avg_tool_calls_per_run)}</td>
                 </tr>
               ))}
             </tbody>
@@ -290,7 +230,6 @@ export default function AgentPage() {
                 <th>Completed-only delta</th>
                 <th>Crash-aware delta</th>
                 <th>Completion gap</th>
-                <th>Pairwise W/T/L</th>
               </tr>
             </thead>
             <tbody>
@@ -317,13 +256,6 @@ export default function AgentPage() {
                   <td className={deltaClass(libraryCompletionDelta.get(library.library) ?? null)}>
                     {formatSignedPercent(libraryCompletionDelta.get(library.library) ?? null)}
                   </td>
-                  <td>
-                    {formatPairwiseOutcome(
-                      library.pairwise_nia_wins,
-                      library.pairwise_ties,
-                      library.pairwise_no_retrieval_wins,
-                    )}
-                  </td>
                 </tr>
               ))}
             </tbody>
@@ -346,7 +278,6 @@ export default function AgentPage() {
                 <th>Completed-only delta</th>
                 <th>Crash-aware delta</th>
                 <th>Completion gap</th>
-                <th>Pairwise W/T/L</th>
               </tr>
             </thead>
             <tbody>
@@ -381,13 +312,6 @@ export default function AgentPage() {
                         task.by_condition.nia_agent.completion_rate,
                         task.by_condition.no_retrieval_agent.completion_rate,
                       ),
-                    )}
-                  </td>
-                  <td>
-                    {formatPairwiseOutcome(
-                      task.pairwise_nia_wins,
-                      task.pairwise_ties,
-                      task.pairwise_no_retrieval_wins,
                     )}
                   </td>
                 </tr>
