@@ -11,6 +11,7 @@ from harness.agent_conditions import AgentConditionConfig
 from harness.agent_llm_clients import AgentLLMClientError, BaseAgentLLMClient
 from harness.agent_prompts import build_agent_prompts
 from harness.agent_tools import (
+    NIA_TOOL_NAME,
     AgentToolError,
     AgentTools,
     build_tool_inventory,
@@ -164,13 +165,16 @@ def run_agent_task(
                         "tool_calls": [tool_call.to_dict() for tool_call in turn.tool_calls],
                     }
                 )
-                execute_turn_tool_calls(
+                tool_error = execute_turn_tool_calls(
                     tools=tools,
                     turn=turn,
                     step_index=step_count,
                     messages=messages,
                     tool_call_records=tool_call_records,
                 )
+                if tool_error is not None:
+                    terminal_status, failure_detail = tool_error
+                    break
                 continue
 
             final_response_text = turn.text
@@ -308,7 +312,7 @@ def execute_turn_tool_calls(
     step_index: int,
     messages: list[dict[str, object]],
     tool_call_records: list[ToolCallRecord],
-) -> None:
+) -> tuple[AgentTerminalStatus, FailureDetail] | None:
     for tool_call in turn.tool_calls:
         started = datetime.now(timezone.utc)
         try:
@@ -337,19 +341,18 @@ def execute_turn_tool_calls(
         )
 
         if error is not None:
-            payload = {"ok": False, "error": error, "tool_name": tool_call.name}
-        else:
-            payload = {"ok": True, "result": result}
+            if tool_call.name == NIA_TOOL_NAME:
+                return "retrieval_error", FailureDetail(kind="retrieval_error", detail=error)
+            return "workspace_tool_error", FailureDetail(kind="workspace_tool_error", detail=error)
 
-        # Keep the agent loop alive on tool failures so the model can recover.
-        # Operational failures are still preserved in tool_call_records.
         messages.append(
             {
                 "role": "tool",
                 "tool_call_id": tool_call.id,
-                "content": json.dumps(payload, ensure_ascii=False),
+                "content": json.dumps(result, ensure_ascii=False),
             }
         )
+    return None
 
 
 def collect_artifacts(*, task: AgentTask, workspace: AgentWorkspace) -> ArtifactCapture:
