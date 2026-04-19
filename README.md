@@ -1,6 +1,7 @@
 # NiaBench
 
 NiaBench is a reproducible benchmark for measuring how much coding models improve when they receive fresh documentation context from Nia.
+It also includes supporting docs, scripts, and a dashboard for inspecting benchmark behavior end to end.
 
 ## What NiaBench Measures
 
